@@ -1,2 +1,3 @@
-# causalinference-finalproj
-Final project repo for causal inference for computational social science class 25 smr georgetown
+# **Causal Inference for Computational Social Science** 25 Summer Georgetown
+
+*Author: Troy Cheng, Hongzhe Wang*
