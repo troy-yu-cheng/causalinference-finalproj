@@ -1,0 +1,57 @@
+---
+title: "finalprojDraft"
+format: html
+editor: visual
+---
+
+## Import data
+
+```{r}
+library(tidyverse)
+vdem_data <- read_csv("V-Dem-CY-Core-v15_csv/V-Dem-CY-Core-v15.csv")
+```
+
+Pick out German, Russia and China
+
+```{r}
+selected_data <- vdem_data |>
+  filter(country_text_id %in% c("DEU", "RUS", "CHN")) |>
+  select(where(~ !any(is.na(.))))
+
+View(selected_data)
+
+names(selected_data)
+```
+
+```{r}
+
+selected_data |>
+  group_by(country_text_id) |>
+  summarize(
+    years_available = sum(!is.na(v2csreprss)),
+    year_min = min(year[!is.na(v2csreprss)]),
+    year_max = max(year[!is.na(v2csreprss)])
+  )
+
+view(selected_data)
+
+
+```
+
+```{r}
+ggplot(selected_data, aes(x = year, y = v2csreprss, color = country_text_id)) +
+  geom_point() +
+  labs(
+    title = "CSO Repression Over Time (V-Dem v2csreprss)",
+    x = "Year",
+    y = "Civil Society Repression",
+    color = "Country"
+  ) +
+  scale_color_manual(
+    values = c("DEU" = "black", "RUS" = "red", "CHN" = "blue"),
+    labels = c("Germany", "Russia", "China")
+  ) +
+  theme_minimal()
+
+
+```
