@@ -35,7 +35,33 @@ engine: knitr
 
 ```{r}
 library(tidyverse)
-vdem_data <- read_csv("data/V-Dem-CY-Core-v15_csv/V-Dem-CY-Core-v15.csv")
+vdem_data <- read_csv("data/V-Dem-CY-FullOthers-v15_csv/V-Dem-CY-Full+Others-v15.csv")
+```
+Use v-dem's own package
+
+```{r}
+#| eval: false
+#| message: false
+#| warning: false
+#| include: false
+install.packages("devtools")
+devtools::install_github("vdeminstitute/vdemdata")
+```
+
+```{r}
+library(vdemdata)
+view(vdem)
+vdemdata::plot_indicator("e_pop")
+```
+
+
+## EDA
+
+```{r}
+#| eval: false
+#| message: false
+#| include: false
+cat(names(vdem), sep = "\n")
 ```
 
 Pick out German, Russia and China
@@ -45,9 +71,7 @@ selected_data <- vdem_data |>
   filter(country_text_id %in% c("DEU", "RUS", "CHN")) |>
   select(where(~ !any(is.na(.))))
 
-View(selected_data)
-
-names(selected_data)
+print(names(selected_data))
 ```
 
 ```{r}
