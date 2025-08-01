@@ -31,7 +31,7 @@ highlight-style: nord
 engine: knitr
 ---
 
-RQ: 1.影响政体变化的因素有哪些？是否形成因果关系 ie 能否说某个变量导致了政体的变化？（普遍意义上，数据为所有国家历史上从1900-2024的数据）
+RQ: 1.影响政体变化的因素有哪些？是否形成因果关系 ie 能否说某个变量导致了政体的变化？（普遍意义上，数据为所有国家历史上到2024约近两百年的数据）
 
 2. 影响共产主义政体成立的因素有哪些？
 
@@ -61,6 +61,60 @@ library(vdemdata)
 library(tidyverse)
 ```
 
+# Label regime change
+
+## add regime change for all countries
+
+```{r}
+vdem_1 <- vdem |>
+  arrange(country_id, year) |> 
+  group_by(country_id) |>
+  mutate(regime_change = if_else(histname != lag(histname), 1, 0, missing = 0)) |>
+  ungroup()
+```
+
+查看国家发生政体变化的年份，以及变更前后的政体名称（histname）
+
+```{r}
+regime_transitions <- vdem_1 |>
+  arrange(country_id, year) |>
+  group_by(country_id) |>
+  mutate(
+    previous_histname = lag(histname),
+    current_histname = histname
+  ) |>
+  filter(regime_change == 1) |>
+  select(country_id, country_name, year, previous_histname, current_histname) |>
+  ungroup()
+```
+
+Naive Logit Model
+
+```{r}
+vdem_model <- vdem_1 |>
+  arrange(country_id, year) |>
+  group_by(country_id) |>
+  mutate(
+    v2x_corr_lag1 = lag(v2x_corr, 1),
+    v2x_polyarchy_lag1 = lag(v2x_polyarchy, 1),
+    v2x_freexp_altinf_lag1 = lag(v2x_freexp_altinf, 1)
+  ) |>
+  ungroup()
+
+model1 <- glm(regime_change ~ v2x_corr_lag1 + v2x_polyarchy_lag1 + v2x_freexp_altinf_lag1,
+              data = vdem_model,
+              family = binomial(link = "logit"))
+
+summary(model1)
+
+library(effects)
+plot(allEffects(model1))
+```
+
+
+# EDA
+
+## Test function in `vdemdata` package
 
 ```{r}
 vdemdata::plot_indicator("v2msuffrage")
@@ -71,8 +125,6 @@ vdemdata::plot_indicator("v2msuffrage")
 plot_indicator(indicator=c( "v2x_egaldem", "v2x_libdem"), countries = c("Germany", "Sweden"),
                      min_year = 1912, max_year = 2000)
 ```
-
-# EDA
 
 ## What country do we have?
 
@@ -120,6 +172,8 @@ ggplot(selected_data, aes(x = year, y = v2csreprss, color = country_text_id)) +
 
 
 ```
+
+
 
 
 
