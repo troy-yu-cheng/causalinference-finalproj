@@ -51,20 +51,24 @@ Use v-dem's own R package
 #| eval: false
 #| message: false
 #| warning: false
-#| include: false
 install.packages("devtools")
 devtools::install_github("vdeminstitute/vdemdata")
 ```
+Load Packages
 
 ```{r}
 library(vdemdata)
-view(vdem)
+library(tidyverse)
+```
+
+
+```{r}
 vdemdata::plot_indicator("v2msuffrage")
 
 # Plot V-Dem indicators liberal democracy and egalitarian democracy
 # for Sweden and Germany between 1912 and 2000.
 
- plot_indicator(indicator=c( "v2x_egaldem", "v2x_libdem"), countries = c("Germany", "Sweden"),
+plot_indicator(indicator=c( "v2x_egaldem", "v2x_libdem"), countries = c("Germany", "Sweden"),
                      min_year = 1912, max_year = 2000)
 ```
 
@@ -73,18 +77,17 @@ vdemdata::plot_indicator("v2msuffrage")
 ## What country do we have?
 
 ```{r}
-unique(vdem_data$country_name)
+unique(vdem$country_name)
 ```
 
 
 Pick out German, Russia and China
 
 ```{r}
-selected_data <- vdem_data |>
+selected_data <- vdem |>
   filter(country_text_id %in% c("DEU", "RUS", "CHN")) |>
   select(where(~ !any(is.na(.))))
 
-print(names(selected_data))
 ```
 
 ```{r}
@@ -96,8 +99,6 @@ selected_data |>
     year_min = min(year[!is.na(v2csreprss)]),
     year_max = max(year[!is.na(v2csreprss)])
   )
-
-view(selected_data)
 
 
 ```
