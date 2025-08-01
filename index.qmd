@@ -11,7 +11,7 @@ title-block-banner: "#0a0e1a"
 title-block-banner-color: "#4DB8FF"
 execute:
   warning: false
-date: 2025-04-28
+date: 2025-07-23
 date-modified: last-modified
 format:
   html:
@@ -31,85 +31,179 @@ highlight-style: nord
 engine: knitr
 ---
 
-RQ: 1.影响政体变化的因素有哪些？是否形成因果关系 ie 能否说某个变量导致了政体的变化？（普遍意义上，数据为所有国家历史上到2024约近两百年的数据）
+# Introduction
 
-2. 影响共产主义政体成立的因素有哪些？
+This project is a practice of causal inference, aiming to complete the journey from correlation to causation in empirical social science research. The study investigates macro-political transformations—particularly regime changes—through a causal lens grounded in computational methods. The analysis relies on [the Varieties of Democracy (V-Dem) dataset](https://github.com/vdeminstitute/vdemdata), one of the most comprehensive global sources on political regimes and democratic institutions. Covering nearly every country from the 18th century to the present, V-Dem provides detailed yearly indicators across political, economic, and social dimensions, allowing for the historical tracking of institutional change.
 
-3. 影响共产主义政体解体的相关变量有哪些？
+In terms of motivation, this project was initiated in response to the comprehensive shocks (cultural, political, etc.) experienced by a Chinese international student upon arriving in the United States. Speaking broken English and surrounded by sarcastic remarks stemming from ["banana discourse"](https://en.wikipedia.org/wiki/Banana,_coconut,_and_Twinkie), the experience prompted reflection on the root causes of the present situation and, more broadly, the structural contest between the social systems of China and the United States. The project seeks to find some kind of scientific conclusion through data and empirical research. Although such clarity is difficult to achieve in the social sciences, where mischievous atoms always lurk, the hope is to apply causal inference techniques to eliminate bias and pursue a theoretically grounded and relatively objective exploration.
 
-4. 影响资本主义政体成立的因素有哪些？
+The analysis is guided by four core research questions:
 
-5. 影响资本主义政体转为共产主义的变量有哪些？
+  1. RQ1: What kinds of factors cause a country to undergo a regime change?
+  2. RQ2: What factors influence the establishment of communist regimes?
+  3. RQ3: What factors contribute to the collapse of communist regimes?
+  4. RQ4: What factors explain the long-term survival of the remaining communist regimes (China, Cuba, Laos, North Korea, and Vietnam)?
+
+These questions are explored through a combination of longitudinal data analysis and logistic modeling, with particular attention to causality and temporal ordering. Special emphasis is placed on the interplay between regime types and structural factors such as inequality, civil conflict, elite coordination, and education levels, in order to identify plausible causal pathways.
 
 
+# RQ1: What kinds of factors cause a country to undergo a regime change?
 
-# Import data
+This section explores the historical predictors of regime change using V-Dem's country-year panel data, covering over 200 years and nearly all sovereign states. We operationalize regime change based on transitions in the `histname` field and use logistic regression to assess whether various political, structural, and conflict-related variables can significantly predict the likelihood of a regime shift.
 
-Use v-dem's own R package
-
-```{r}
-#| eval: false
-#| message: false
-#| warning: false
-install.packages("devtools")
-devtools::install_github("vdeminstitute/vdemdata")
-```
-Load Packages
+## Import Data and Load Packages
 
 ```{r}
+# Install V-Dem data package:
+# install.packages("devtools")
+# devtools::install_github("vdeminstitute/vdemdata")
+
 library(vdemdata)
 library(tidyverse)
+library(effects)
+library(stringr)
 ```
 
-# Label regime change
 
-## add regime change for all countries
+## Create Regime Change Variable
+
+We define regime change as a change in the `histname` field within a country across years.
 
 ```{r}
-vdem_1 <- vdem |>
+vdem_1 <- vdem |> 
   arrange(country_id, year) |> 
-  group_by(country_id) |>
-  mutate(regime_change = if_else(histname != lag(histname), 1, 0, missing = 0)) |>
+  group_by(country_id) |> 
+  mutate(regime_change = if_else(histname != lag(histname), 1, 0, missing = 0)) |> 
   ungroup()
-```
 
-查看国家发生政体变化的年份，以及变更前后的政体名称（histname）
-
-```{r}
-regime_transitions <- vdem_1 |>
-  arrange(country_id, year) |>
-  group_by(country_id) |>
+regime_transitions <- vdem_1 |> 
+  arrange(country_id, year) |> 
+  group_by(country_id) |> 
   mutate(
     previous_histname = lag(histname),
     current_histname = histname
-  ) |>
-  filter(regime_change == 1) |>
-  select(country_id, country_name, year, previous_histname, current_histname) |>
+  ) |> 
+  filter(regime_change == 1) |> 
+  select(country_id, country_name, year, previous_histname, current_histname) |> 
   ungroup()
 ```
 
-Naive Logit Model
+## Naive Logit Model with Political Indicators
+
+We first test a simple model using three high-level indices:
+- `v2x_corr`: Control of corruption
+- `v2x_polyarchy`: Electoral democracy index
+- `v2x_freexp_altinf`: Freedom of alternative sources of information
 
 ```{r}
-vdem_model <- vdem_1 |>
-  arrange(country_id, year) |>
-  group_by(country_id) |>
+vdem_model <- vdem_1 |> 
+  arrange(country_id, year) |> 
+  group_by(country_id) |> 
   mutate(
     v2x_corr_lag1 = lag(v2x_corr, 1),
     v2x_polyarchy_lag1 = lag(v2x_polyarchy, 1),
     v2x_freexp_altinf_lag1 = lag(v2x_freexp_altinf, 1)
-  ) |>
+  ) |> 
   ungroup()
 
 model1 <- glm(regime_change ~ v2x_corr_lag1 + v2x_polyarchy_lag1 + v2x_freexp_altinf_lag1,
               data = vdem_model,
               family = binomial(link = "logit"))
-
 summary(model1)
-
-library(effects)
-plot(allEffects(model1))
 ```
+
+## Structural and Background Factors Model
+
+We expand the model to include structural and conflict variables:
+- `e_gdppc`: GDP per capita
+- `e_peaveduc`: Education level (15+)
+- `e_civil_war`: Civil war dummy
+- `e_pt_coup`: Number of coup attempts
+
+```{r}
+vdem_model1 <- vdem_model |>
+  arrange(country_id, year) |>
+  group_by(country_id) |>
+  mutate(
+    e_gdppc_lag1 = lag(e_gdppc),
+    e_peaveduc_lag1 = lag(e_peaveduc),
+    e_civil_war_lag1 = lag(e_civil_war),
+    e_pt_coup_lag1 = lag(e_pt_coup),
+    e_total_oil_income_pc_lag1 = lag(e_total_oil_income_pc)
+  ) |>
+  ungroup()
+
+model_bg <- glm(regime_change ~ 
+                  v2x_polyarchy_lag1 + 
+                  e_gdppc_lag1 + 
+                  e_civil_war_lag1 + 
+                  e_pt_coup_lag1 + 
+                  e_peaveduc_lag1,
+                data = vdem_model1,
+                family = binomial(link = "logit"))
+summary(model_bg)
+```
+
+## Visualizing Marginal Effects
+
+```{r}
+plot(allEffects(model1))
+plot(allEffects(model_bg))
+```
+
+## Interpretation
+
+Initial results suggest that lower levels of electoral democracy and active civil conflict significantly increase the likelihood of regime change. However, economic indicators such as GDP and education do not appear to have strong predictive power in this specification.
+
+---
+
+# RQ2: What factors influence the establishment of communist regimes?
+
+```{r}
+
+regime_transitions |>
+  filter(str_detect(current_histname, "People's Republic") |
+         str_detect(current_histname, "Socialist Republic") |
+         str_detect(current_histname, "Socialist") |
+         str_detect(current_histname, "Soviet") |
+         str_detect(current_histname, "Democratic People's Republic")) |>
+  arrange(year)
+
+
+communist_keywords <- c("People's Republic", "Socialist Republic", "Socialist", "Soviet", "Democratic People's Republic", "People's Democratic Republic")
+
+regime_transitions |>
+  filter(str_detect(current_histname, str_c(communist_keywords, collapse = "|"))) |>
+  arrange(country_id, year) |>
+  group_by(country_id) |>
+  slice_min(year, n = 1) |> 
+  ungroup() |>
+  arrange(year)
+
+```
+
+
+
+Georgia Soviet Socialist Republic缺失政体建立前后时期的数据
+
+
+**Next Steps**:
+We will next turn to more specific questions:
+
+- What factors explain the formation of communist regimes?
+- What causes communist regimes to collapse?
+- What drives capitalist regimes to transition into communism?
+
+We will construct new binary regime-type indicators to address these questions in subsequent models.
+
+
+# RQ3: What factors contribute to the collapse of communist regimes?
+
+
+# RQ4: What factors explain the long-term survival of the remaining communist regimes (China, Cuba, Laos, North Korea, and Vietnam)?
+
+
+
 
 
 # EDA
