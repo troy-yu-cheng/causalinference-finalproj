@@ -31,13 +31,21 @@ highlight-style: nord
 engine: knitr
 ---
 
-## Import data
+RQ: 1.影响政体变化的因素有哪些？是否形成因果关系 ie 能否说某个变量导致了政体的变化？（普遍意义上，数据为所有国家历史上从1900-2024的数据）
 
-```{r}
-library(tidyverse)
-vdem_data <- read_csv("data/V-Dem-CY-FullOthers-v15_csv/V-Dem-CY-Full+Others-v15.csv")
-```
-Use v-dem's own package
+2. 影响共产主义政体成立的因素有哪些？
+
+3. 影响共产主义政体解体的相关变量有哪些？
+
+4. 影响资本主义政体成立的因素有哪些？
+
+5. 影响资本主义政体转为共产主义的变量有哪些？
+
+
+
+# Import data
+
+Use v-dem's own R package
 
 ```{r}
 #| eval: false
@@ -51,18 +59,23 @@ devtools::install_github("vdeminstitute/vdemdata")
 ```{r}
 library(vdemdata)
 view(vdem)
-vdemdata::plot_indicator("e_pop")
+vdemdata::plot_indicator("v2msuffrage")
+
+# Plot V-Dem indicators liberal democracy and egalitarian democracy
+# for Sweden and Germany between 1912 and 2000.
+
+ plot_indicator(indicator=c( "v2x_egaldem", "v2x_libdem"), countries = c("Germany", "Sweden"),
+                     min_year = 1912, max_year = 2000)
 ```
 
+# EDA
 
-## EDA
+## What country do we have?
 
 ```{r}
-#| eval: false
-#| message: false
-#| include: false
-cat(names(vdem), sep = "\n")
+unique(vdem_data$country_name)
 ```
+
 
 Pick out German, Russia and China
 
