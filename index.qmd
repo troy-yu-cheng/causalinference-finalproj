@@ -47,6 +47,10 @@ if (length(miss)) {
 
 ```
 
+# Note
+
+Hi Prof. Jeff, I have some issues regarding to rendering LaTex. I'll fix it in next three hours. Thx for your patience!
+
 # Introduction
 
 Understanding why regimes endure or break down is a core question in comparative politics. This project takes a **design-based causal approach** to ask whether conditions observed in year *t* make a **coup termination** of the regime more likely in year *t+1*. We leverage the [**Varieties of Democracy (V-Dem)**](https://www.v-dem.net/) country–year panel, which provides globally comparable annual indicators since the eighteenth century, and we align predictors to year *t* and outcomes to year *t+1* to avoid temporal leakage. Our focus is intentionally narrow: do **coup attempts in year** *t* raise the short-run risk that a regime ends **via a coup** next year, once we account for country heterogeneity and time-varying turmoil?
