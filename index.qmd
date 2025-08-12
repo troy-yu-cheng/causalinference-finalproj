@@ -104,7 +104,6 @@ vdem_change <- vdem_change %>%
 
 ```
 
-
 ```{r}
 # 3.1 变迁的总体比例（基准率）
 mean(vdem_change$regime_change_histname, na.rm = TRUE)
@@ -116,10 +115,7 @@ vdem_change %>%
   head(10)
 ```
 
-
-
 把 v2regendtype 的分布看清楚——既看总体分布，也看发生变迁（你用 y_t1_histname==1）时下一年的“结束类型”分布。只做这一步，先不建模。
-
 
 ```{r}
 #| label: regendtype-distribution
@@ -183,8 +179,6 @@ cat("# of t+1 rows with a non-13 end-type label:", n_labeled_events, "\n")
 
 ```
 
-
-
 ## 步骤 A（R → 准备 y 和先验 α, β）
 
 放在 Python 块之前；它只做三件事：从 vdem_change 构造 y（t+1 是否以 coup 收场）、计算经验比例 p0、给出先验强度 m 和 alpha, beta。
@@ -211,8 +205,67 @@ length(y); mean(y); alpha; beta
 ```
 
 
-## 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）
+在 R 里和 y 对齐一个自变量 x_attempt（0/1）：
 
+```{r}
+# 放在 r-make-y-and-prior 之后
+#| label: r-make-x-attempt
+library(dplyr)
+
+df_yx <- vdem_change %>%
+  mutate(
+    y = dplyr::case_when(
+      regend_t1 %in% c(0,1,2) ~ 1L,
+      !is.na(regend_t1) & regend_t1 != 13 ~ 0L,
+      TRUE ~ NA_integer_
+    ),
+    # ① 企图次数（当年 t）
+    coup_attempts_t = e_pt_coup_attempts,
+    # ② 二值化：是否有企图（成功与否都算）
+    x_attempt = ifelse(!is.na(coup_attempts_t) & coup_attempts_t > 0, 1L, 0L)
+  ) %>%
+  filter(!is.na(y)) %>%                  # 跟 y 对齐
+  select(y, x_attempt)
+
+# 传给 Python
+y <- as.integer(df_yx$y)
+x <- as.integer(df_yx$x_attempt)
+N <- length(y)
+
+# 看一下两组样本量（有/无企图）
+table(x)
+
+```
+
+条件版解析（两组的 prior/obs/post）
+
+```{python}
+#| label: py-conditional-analytic
+import numpy as np
+
+y = np.array(r.y, dtype="int64")
+x = np.array(r.x, dtype="int64")
+alpha = float(r.alpha); beta = float(r.beta)
+
+def stats(mask, name):
+    y_g = y[mask]; n = len(y_g); s = int(y_g.sum())
+    prior_mean = alpha/(alpha+beta)
+    post_mean  = (alpha + s)/(alpha + beta + n)   # Beta–Bernoulli 共轭后验均值
+    obs_mean   = y_g.mean() if n>0 else np.nan
+    return {"group": name, "n": n,
+            "prior_mean": round(float(prior_mean),4),
+            "obs_mean":   round(float(obs_mean),4),
+            "post_mean":  round(float(post_mean),4)}
+
+out = [stats(x==1, "attempt=1"), stats(x==0, "attempt=0")]
+print(out)
+print({"posterior_diff": round(out[0]["post_mean"] - out[1]["post_mean"], 4)})
+
+
+```
+
+
+## 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）
 
 ```{python}
 #| label: py-pgm-beta-bern
@@ -239,9 +292,19 @@ pm.model_to_graphviz(beta_bern).render(filename="pgm_base", format="svg", cleanu
 
 ```
 
-
 ![](pgm_base.svg)
 
+现在的 baseline **只有一个全局概率** pcoupp_{\text{coup}}pcoup​，它回答的是：
+
+> “在所有 *会在 t+1 年结束* 的政体中，‘以政变方式结束’的大致占比是多少？”
+
+它**没有**利用任何 t 年的信息（比如是否出现政变企图、内战、抗议等）。因此它**不区分情境**，把所有国家–年都“混在一起”估一个平均值。这对做基线/检查管用，但回答不了这类问题：
+
+-    “当年**有政变企图**时，下一年以政变收场的概率是否更高？”
+
+-    “**内战**的年份 vs 非内战年份，这个概率有什么差异？”
+
+所以要加“条件变量”（covariate），是为了**把总体概率拆成情境化的概率**，也就是从
 
 ## 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字
 
@@ -250,11 +313,9 @@ pm.model_to_graphviz(beta_bern).render(filename="pgm_base", format="svg", cleanu
 ```{r}
 #| label: opts
 #| echo: false
-RUN_MCMC <- FALSE   # 默认走解析解；想跑MCMC时改 TRUE
+RUN_MCMC <- FALSE 
 DRAWS    <- 800
 TUNE     <- 400
-
-
 ```
 
 ```{python}
@@ -291,28 +352,6 @@ print({"mode": mode,
 
 
 ```
-
-
-```{python}
-#| eval: false
-#| include: false
-
-import pymc as pm
-
-alpha, beta = 20*0.08, 20*(1-0.08)  # 先验参数
-
-with pm.Model() as beta_bern:
-    p_coup = pm.Beta("p_coup", alpha=alpha, beta=beta)
-    coup_t1 = pm.Bernoulli("coup_t1", p=p_coup, observed=y)
-
-dot = pm.model_to_graphviz(beta_bern)
-dot.render(filename="pgm", format="svg", cleanup=True)
-
-```
-
-
-
-
 
 ```{=html}
 <script>

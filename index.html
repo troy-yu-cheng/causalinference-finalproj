@@ -3424,31 +3424,93 @@ background: #0a0e1a;
 <pre><code>[1] 15.7243</code></pre>
 </div>
 </div>
+<p>在 R 里和 y 对齐一个自变量 x_attempt（0/1）：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 放在 r-make-y-and-prior 之后</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: r-make-x-attempt</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>df_yx <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      regend_t1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">~</span> <span class="dv">1</span>L,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(regend_t1) <span class="sc">&amp;</span> regend_t1 <span class="sc">!=</span> <span class="dv">13</span> <span class="sc">~</span> <span class="dv">0</span>L,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_integer_</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ① 企图次数（当年 t）</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">coup_attempts_t =</span> e_pt_coup_attempts,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ② 二值化：是否有企图（成功与否都算）</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_attempt =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(coup_attempts_t) <span class="sc">&amp;</span> coup_attempts_t <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>L, <span class="dv">0</span>L)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(y)) <span class="sc">%&gt;%</span>                  <span class="co"># 跟 y 对齐</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(y, x_attempt)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 传给 Python</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_yx<span class="sc">$</span>y)</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_yx<span class="sc">$</span>x_attempt)</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 看一下两组样本量（有/无企图）</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x
+    0     1 
+20896   359 </code></pre>
+</div>
+</div>
+<p>条件版解析（两组的 prior/obs/post）</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array(r.x, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> stats(mask, name):</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    y_g <span class="op">=</span> y[mask]<span class="op">;</span> n <span class="op">=</span> <span class="bu">len</span>(y_g)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y_g.<span class="bu">sum</span>())</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    post_mean  <span class="op">=</span> (alpha <span class="op">+</span> s)<span class="op">/</span>(alpha <span class="op">+</span> beta <span class="op">+</span> n)   <span class="co"># Beta–Bernoulli 共轭后验均值</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    obs_mean   <span class="op">=</span> y_g.mean() <span class="cf">if</span> n<span class="op">&gt;</span><span class="dv">0</span> <span class="cf">else</span> np.nan</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;group&quot;</span>: name, <span class="st">&quot;n&quot;</span>: n,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)}</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> [stats(x<span class="op">==</span><span class="dv">1</span>, <span class="st">&quot;attempt=1&quot;</span>), stats(x<span class="op">==</span><span class="dv">0</span>, <span class="st">&quot;attempt=0&quot;</span>)]</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[{&#39;group&#39;: &#39;attempt=1&#39;, &#39;n&#39;: 359, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.4958, &#39;post_mean&#39;: 0.4809}, {&#39;group&#39;: &#39;attempt=0&#39;, &#39;n&#39;: 20896, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.2089, &#39;post_mean&#39;: 0.2089}]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;posterior_diff&quot;</span>: <span class="bu">round</span>(out[<span class="dv">0</span>][<span class="st">&quot;post_mean&quot;</span>] <span class="op">-</span> out[<span class="dv">1</span>][<span class="st">&quot;post_mean&quot;</span>], <span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{&#39;posterior_diff&#39;: 0.272}</code></pre>
+</div>
+</div>
 </section>
 <section id="步骤-bpython-画pgm并落地成-svg-包含进-html" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="步骤-bpython-画pgm并落地成-svg-包含进-html"><span class="header-section-number">4.2</span> 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>WARNING (pytensor.configdefaults): g++ not available, if using conda: `conda install gxx`
 WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to compile C-implementations and will default to Python. Performance may be severely degraded. To remove this warning, set PyTensor flags cxx to an empty string.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从 R 取数</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">int</span>(r.N)</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 给模型声明 plate</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {<span class="st">&quot;obs_id&quot;</span>: np.arange(N)}</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> beta_bern:</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 顶部：Beta先验</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 底部：观测数据（带 plate）</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;saycoup_obs&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y, dims<span class="op">=</span><span class="st">&quot;obs_id&quot;</span>)</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成 pgm_base.svg 并清理中间文件</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(beta_bern).render(filename<span class="op">=</span><span class="st">&quot;pgm_base&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从 R 取数</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">int</span>(r.N)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 给模型声明 plate</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {<span class="st">&quot;obs_id&quot;</span>: np.arange(N)}</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> beta_bern:</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 顶部：Beta先验</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 底部：观测数据（带 plate）</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;saycoup_obs&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y, dims<span class="op">=</span><span class="st">&quot;obs_id&quot;</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成 pgm_base.svg 并清理中间文件</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(beta_bern).render(filename<span class="op">=</span><span class="st">&quot;pgm_base&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&#39;pgm_base.svg&#39;</code></pre>
 </div>
@@ -3485,40 +3547,50 @@ WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to
 </g>
 </g>
 </svg></p>
+<p>现在的 baseline <strong>只有一个全局概率</strong> pcoupp_{}pcoup​，它回答的是：</p>
+<blockquote class="blockquote">
+<p>“在所有 <em>会在 t+1 年结束</em> 的政体中，’以政变方式结束’的大致占比是多少？”</p>
+</blockquote>
+<p>它<strong>没有</strong>利用任何 t 年的信息（比如是否出现政变企图、内战、抗议等）。因此它<strong>不区分情境</strong>，把所有国家–年都“混在一起”估一个平均值。这对做基线/检查管用，但回答不了这类问题：</p>
+<ul>
+<li><p>“当年<strong>有政变企图</strong>时，下一年以政变收场的概率是否更高？”</p></li>
+<li><p>“<strong>内战</strong>的年份 vs 非内战年份，这个概率有什么差异？”</p></li>
+</ul>
+<p>所以要加“条件变量”（covariate），是为了<strong>把总体概率拆成情境化的概率</strong>，也就是从</p>
 </section>
 <section id="步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字"><span class="header-section-number">4.3</span> 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字</h2>
 <p>先不画图、不做复杂评估，只看先验均值 vs 后验均值 vs 观测均值，确认“信息更新”的方向对不对。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>RUN_MCMC <span class="op">=</span> <span class="bu">bool</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;RUN_MCMC&quot;</span>, <span class="va">False</span>))</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>DRAWS    <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;DRAWS&quot;</span>, <span class="dv">800</span>))</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>TUNE     <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;TUNE&quot;</span>, <span class="dv">400</span>))</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>obs_mean   <span class="op">=</span> y.mean()</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> RUN_MCMC:</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> beta_bern:</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>        idata <span class="op">=</span> pm.sample(draws<span class="op">=</span>DRAWS, tune<span class="op">=</span>TUNE,</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                          chains<span class="op">=</span><span class="dv">2</span>, cores<span class="op">=</span><span class="dv">1</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>,</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>                          random_seed<span class="op">=</span><span class="dv">42</span>, compute_convergence_checks<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> <span class="bu">float</span>(idata.posterior[<span class="st">&quot;p_coup&quot;</span>].values.mean())</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;mcmc&quot;</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> (alpha <span class="op">+</span> s) <span class="op">/</span> (alpha <span class="op">+</span> beta <span class="op">+</span> N)   <span class="co"># Beta–Bernoulli 共轭的解析后验均值</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;analytic&quot;</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;mode&quot;</span>: mode,</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>RUN_MCMC <span class="op">=</span> <span class="bu">bool</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;RUN_MCMC&quot;</span>, <span class="va">False</span>))</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>DRAWS    <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;DRAWS&quot;</span>, <span class="dv">800</span>))</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>TUNE     <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;TUNE&quot;</span>, <span class="dv">400</span>))</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>obs_mean   <span class="op">=</span> y.mean()</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> RUN_MCMC:</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> beta_bern:</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        idata <span class="op">=</span> pm.sample(draws<span class="op">=</span>DRAWS, tune<span class="op">=</span>TUNE,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                          chains<span class="op">=</span><span class="dv">2</span>, cores<span class="op">=</span><span class="dv">1</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>,</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>                          random_seed<span class="op">=</span><span class="dv">42</span>, compute_convergence_checks<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> <span class="bu">float</span>(idata.posterior[<span class="st">&quot;p_coup&quot;</span>].values.mean())</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;mcmc&quot;</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> (alpha <span class="op">+</span> s) <span class="op">/</span> (alpha <span class="op">+</span> beta <span class="op">+</span> N)   <span class="co"># Beta–Bernoulli 共轭的解析后验均值</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;analytic&quot;</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;mode&quot;</span>: mode,</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{&#39;mode&#39;: &#39;analytic&#39;, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.2138, &#39;post_mean&#39;: 0.2138}</code></pre>
 </div>
