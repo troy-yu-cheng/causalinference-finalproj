@@ -1,0 +1,87 @@
+"country_id","country_name","year","end_bucket","civil_lag1","intl_lag1","internal_lag1","coup_lag1","attempts_lag1"
+8,"South Africa",1960,"liberalization/democratization",0,0,0,0,0
+9,"Japan",1951,"war_loss/foreign_intervention",0,0,0,0,0
+11,"Russia",1990,"liberalization/democratization",0,0,0,0,0
+12,"Albania",1975,"liberalization/democratization",0,0,0,0,0
+12,"Albania",1990,"liberalization/democratization",0,0,0,0,0
+13,"Egypt",1952,"other_transformation",0,1,0,0,0
+13,"Egypt",1957,"popular_uprising",0,1,0,0,0
+13,"Egypt",1960,"popular_uprising",0,0,0,0,0
+13,"Egypt",1966,"popular_uprising",0,0,0,0,0
+13,"Egypt",1981,"popular_uprising",0,0,0,0,0
+14,"Yemen",1961,"coup/assassination",0,0,0,0,0
+14,"Yemen",1989,"other_transformation",0,0,0,0,0
+17,"Poland",1951,"coup/assassination",0,0,0,0,0
+17,"Poland",1989,"other_transformation",0,0,0,0,0
+19,"Brazil",1967,"liberalization/democratization",0,0,0,0,0
+31,"Senegal",1981,"liberalization/democratization",0,0,0,0,0
+31,"Senegal",1988,"liberalization/democratization",0,0,0,0,0
+34,"Vietnam",1975,"war_loss/foreign_intervention",0,0,0,0,0
+36,"Afghanistan",1972,"coup/assassination",0,0,0,0,0
+36,"Afghanistan",1977,"coup/assassination",0,0,0,0,0
+36,"Afghanistan",1978,"war_loss/foreign_intervention",0,0,0,0,0
+36,"Afghanistan",1988,"war_loss/foreign_intervention",1,0,1,0,0
+36,"Afghanistan",1991,"war_loss/foreign_intervention",1,0,1,0,1
+36,"Afghanistan",1995,"war_loss/foreign_intervention",1,0,1,0,0
+36,"Afghanistan",2000,"war_loss/foreign_intervention",1,0,1,0,0
+38,"Ethiopia",1994,"other_transformation",0,0,0,0,0
+44,"Lebanon",1991,"popular_uprising",1,0,1,0,0
+51,"Venezuela",1952,"coup/assassination",0,0,0,0,0
+51,"Venezuela",1999,"coup/assassination",0,0,0,0,0
+54,"Burkina Faso",1983,"coup/assassination",0,0,0,1,1
+55,"Cambodia",1974,"war_loss/foreign_intervention",1,0,1,0,0
+55,"Cambodia",1977,"war_loss/foreign_intervention",0,0,1,0,0
+55,"Cambodia",1978,"war_loss/foreign_intervention",0,0,1,0,0
+55,"Cambodia",1989,"other_transformation",1,0,1,0,0
+55,"Cambodia",1992,"other_transformation",1,0,1,0,0
+62,"Zimbabwe",1978,"liberalization/democratization",1,0,0,0,0
+62,"Zimbabwe",1979,"liberalization/democratization",1,0,0,0,0
+71,"Central African Republic",1975,"coup/assassination",0,0,0,0,0
+71,"Central African Republic",1978,"war_loss/foreign_intervention",0,0,0,0,0
+76,"France",1957,"other_transformation",0,1,0,0,0
+79,"Iran",1978,"coup/assassination",0,0,0,0,0
+80,"Iraq",1957,"coup/assassination",0,0,0,0,0
+89,"Mongolia",1991,"liberalization/democratization",0,0,0,0,0
+92,"Panama",1978,"leader_natural_death",0,0,0,0,0
+96,"Spain",1974,"leader_natural_death",0,0,0,0,0
+97,"Syria",1957,"other_transformation",0,0,0,0,0
+97,"Syria",1960,"coup/assassination",0,0,0,0,0
+108,"Cameroon",1971,"coup/assassination",0,0,0,0,0
+111,"Democratic Republic of the Congo",1964,"coup/assassination",1,0,0,0,0
+111,"Democratic Republic of the Congo",1970,"war_loss/foreign_intervention",0,0,0,0,0
+111,"Democratic Republic of the Congo",1996,"war_loss/foreign_intervention",0,0,0,0,0
+112,"Republic of the Congo",1969,"coup/assassination",0,0,0,1,2
+112,"Republic of the Congo",1990,"liberalization/democratization",0,0,0,0,0
+114,"Dominican Republic",1964,"war_loss/foreign_intervention",0,0,0,1,1
+114,"Dominican Republic",1965,"liberalization/democratization",0,0,0,0,0
+117,"The Gambia",1969,"other_transformation",0,0,0,0,0
+118,"Georgia",1994,"coup/assassination",1,0,1,0,0
+123,"Laos",1974,"war_loss/foreign_intervention",1,0,1,0,1
+124,"Libya",1962,"coup/assassination",0,0,0,0,0
+124,"Libya",1967,"coup/assassination",0,0,0,0,0
+124,"Libya",1972,"war_loss/foreign_intervention",0,0,0,0,0
+124,"Libya",1985,"war_loss/foreign_intervention",0,0,0,0,0
+130,"Somalia",1968,"coup/assassination",0,0,0,0,0
+130,"Somalia",1990,"war_loss/foreign_intervention",1,0,1,0,0
+131,"Sri Lanka",1971,"other_transformation",0,0,0,0,0
+131,"Sri Lanka",1977,"other_transformation",0,0,0,0,0
+135,"Trinidad and Tobago",1977,"liberalization/democratization",0,0,0,0,0
+150,"Bosnia and Herzegovina",1994,"war_loss/foreign_intervention",1,0,1,0,0
+152,"Bulgaria",1989,"liberalization/democratization",0,0,0,0,0
+154,"Croatia",1994,"war_loss/foreign_intervention",0,1,0,0,0
+156,"Cyprus",1973,"war_loss/foreign_intervention",0,0,0,0,0
+157,"Czechia",1988,"popular_uprising",0,0,0,0,0
+157,"Czechia",1989,"other_transformation",0,0,0,0,0
+157,"Czechia",1991,"other_transformation",0,0,0,0,0
+162,"Fiji",1986,"coup/assassination",0,0,0,0,0
+162,"Fiji",1989,"liberalization/democratization",0,0,0,0,0
+162,"Fiji",1997,"coup/assassination",0,0,0,0,0
+164,"Greece",1972,"war_loss/foreign_intervention",0,0,0,0,0
+166,"Guyana",1969,"other_transformation",0,0,0,0,0
+171,"Kuwait",1989,"war_loss/foreign_intervention",0,0,0,0,0
+171,"Kuwait",1990,"war_loss/foreign_intervention",0,0,0,0,0
+177,"Malaysia",1962,"other_transformation",0,0,0,0,0
+190,"Romania",1964,"popular_uprising",0,0,0,0,0
+190,"Romania",1988,"popular_uprising",0,0,0,0,0
+198,"Serbia",1991,"other_transformation",0,0,0,0,0
+210,"Hungary",1988,"liberalization/democratization",0,0,0,0,0

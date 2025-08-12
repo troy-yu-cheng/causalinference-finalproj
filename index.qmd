@@ -1,6 +1,6 @@
 ---
 title: "Causal Inference for Computational Social Science"
-subtitle: "V-DEM EDA for PGM"
+subtitle: "Regime Change Causal Modeling with V-Dem"
 author: 
   - name: "Troy Cheng, Hongzhe Wang"
     email: yc1317@georgetown.edu
@@ -31,27 +31,21 @@ highlight-style: nord
 engine: knitr
 ---
 
+# Note:
+
+Hi, Prof. Jeff, I encountered a rendering issue, I'll fix this file in 8 hours.
+
 # Introduction
 
 This project is a practice of causal inference, aiming to complete the journey from correlation to causation in empirical social science research. The study investigates macro-political transformations—particularly regime changes—through a causal lens grounded in computational methods. The analysis relies on [the Varieties of Democracy (V-Dem) dataset](https://github.com/vdeminstitute/vdemdata), one of the most comprehensive global sources on political regimes and democratic institutions. Covering nearly every country from the 18th century to the present, V-Dem provides detailed yearly indicators across political, economic, and social dimensions, allowing for the historical tracking of institutional change.
 
-In terms of motivation, this project was initiated in response to the comprehensive shocks (cultural, political, etc.) experienced by a Chinese international student upon arriving in the United States. Speaking broken English and surrounded by sarcastic remarks stemming from ["banana discourse"](https://en.wikipedia.org/wiki/Banana,_coconut,_and_Twinkie), the experience prompted reflection on the root causes of the present situation and, more broadly, the structural contest between the social systems of China and the United States. The project seeks to find some kind of scientific conclusion through data and empirical research. Although such clarity is difficult to achieve in the social sciences, where mischievous atoms always lurk, the hope is to apply causal inference techniques to eliminate bias and pursue a theoretically grounded and relatively objective exploration.
-
 The analysis is guided by four core research questions:
 
-  1. RQ1: What kinds of factors cause a country to undergo a regime change?
-  2. RQ2: What factors influence the establishment of communist regimes?
-  3. RQ3: What factors contribute to the collapse of communist regimes?
-  4. RQ4: What factors explain the long-term survival of the remaining communist regimes (China, Cuba, Laos, North Korea, and Vietnam)?
+RQ: What kinds of factors cause a country to undergo a regime change?
 
-These questions are explored through a combination of longitudinal data analysis and logistic modeling, with particular attention to causality and temporal ordering. Special emphasis is placed on the interplay between regime types and structural factors such as inequality, civil conflict, elite coordination, and education levels, in order to identify plausible causal pathways.
+We study macro-political transformations with a causal lens. The unit is country–year. To avoid temporal leakage, the outcome is whether a regime change occurs in year t+1 given information available by the end of year t. We use V-Dem for yearly indicators. Conceptually, we posit that shocks (economic, conflict), mobilization (protest), repression, and institutional constraints shape the hazard of regime change, with possible unobserved country-level traits.
 
-
-# RQ1: What kinds of factors cause a country to undergo a regime change?
-
-This section explores the historical predictors of regime change using V-Dem's country-year panel data, covering over 200 years and nearly all sovereign states. We operationalize regime change based on transitions in the `histname` field and use logistic regression to assess whether various political, structural, and conflict-related variables can significantly predict the likelihood of a regime shift.
-
-## Import Data and Load Packages
+# Import Vdem Data using its R Package
 
 ```{r}
 # Install V-Dem data package:
@@ -59,217 +53,135 @@ This section explores the historical predictors of regime change using V-Dem's c
 # devtools::install_github("vdeminstitute/vdemdata")
 
 library(vdemdata)
+```
+
+# Operationalizing Regime Change
+
+V-Dem includes a variable, `v2reginfo`, that labels distinct historical phases within the same political entity (e.g., “Soviet Russia,” “USSR under Stalin,” “Post-Stalin USSR”) as separate regimes. While this fine-grained coding is valuable for phase-typed institutional histories, in this study I adopt a broader conception of “regime” tied to the persistence of the overarching political entity. Concretely, I operationalize regime change as a within-country shift in `histname` across adjacent years. This choice treats leader-centered or intra-regime episodes (that `v2reginfo` may separate) as continuity rather than change, while recognizing foundational transformations that coincide with historical-state redefinitions (e.g., mergers, dissolutions, refoundings). I report sensitivity analyses that compare this `histname`-based indicator to a `v2reginfo`-based alternative to gauge how inferences depend on the operationalization.
+
+```{r}
+
+#| label: make-regime-change
+#| message: false
 library(tidyverse)
-library(effects)
 library(stringr)
-```
+library(tidyr)
 
+# 2.1 标准化 histname，避免大小写/空白导致的伪变化
+vdem_change <- vdem %>%
+  arrange(country_id, year) %>%
+  mutate(histname_std = str_squish(str_to_lower(histname)))
 
-## Create Regime Change Variable
-
-We define regime change as a change in the `histname` field within a country across years.
-
-```{r}
-vdem_1 <- vdem |> 
-  arrange(country_id, year) |> 
-  group_by(country_id) |> 
-  mutate(regime_change = if_else(histname != lag(histname), 1, 0, missing = 0)) |> 
-  ungroup()
-
-regime_transitions <- vdem_1 |> 
-  arrange(country_id, year) |> 
-  group_by(country_id) |> 
+# 2.2 基于 histname 的相邻年差异，定义当年是否“发生变迁”
+vdem_change <- vdem_change %>%
+  group_by(country_id) %>%
   mutate(
-    previous_histname = lag(histname),
-    current_histname = histname
-  ) |> 
-  filter(regime_change == 1) |> 
-  select(country_id, country_name, year, previous_histname, current_histname) |> 
-  ungroup()
-```
+    regime_change_histname = as.integer(!is.na(histname_std) & histname_std != lag(histname_std))
+  ) %>%
+  ungroup() %>%
+  mutate(regime_change_histname = replace_na(regime_change_histname, 0L))
 
-## Naive Logit Model with Political Indicators
-
-We first test a simple model using three high-level indices:
-- `v2x_corr`: Control of corruption
-- `v2x_polyarchy`: Electoral democracy index
-- `v2x_freexp_altinf`: Freedom of alternative sources of information
-
-```{r}
-vdem_model <- vdem_1 |> 
-  arrange(country_id, year) |> 
-  group_by(country_id) |> 
-  mutate(
-    v2x_corr_lag1 = lag(v2x_corr, 1),
-    v2x_polyarchy_lag1 = lag(v2x_polyarchy, 1),
-    v2x_freexp_altinf_lag1 = lag(v2x_freexp_altinf, 1)
-  ) |> 
+# 2.3 面向预测：构造 Y_{t+1}（用 t 年特征预测 t+1 年是否变迁）
+vdem_change <- vdem_change %>%
+  group_by(country_id) %>%
+  mutate(y_t1_histname = replace_na(lead(regime_change_histname, 1), 0L)) %>%
   ungroup()
 
-model1 <- glm(regime_change ~ v2x_corr_lag1 + v2x_polyarchy_lag1 + v2x_freexp_altinf_lag1,
-              data = vdem_model,
-              family = binomial(link = "logit"))
-summary(model1)
 ```
 
-## Structural and Background Factors Model
-
-We expand the model to include structural and conflict variables:
-- `e_gdppc`: GDP per capita
-- `e_peaveduc`: Education level (15+)
-- `e_civil_war`: Civil war dummy
-- `e_pt_coup`: Number of coup attempts
 
 ```{r}
-vdem_model1 <- vdem_model |>
-  arrange(country_id, year) |>
-  group_by(country_id) |>
-  mutate(
-    e_gdppc_lag1 = lag(e_gdppc),
-    e_peaveduc_lag1 = lag(e_peaveduc),
-    e_civil_war_lag1 = lag(e_civil_war),
-    e_pt_coup_lag1 = lag(e_pt_coup),
-    e_total_oil_income_pc_lag1 = lag(e_total_oil_income_pc)
-  ) |>
-  ungroup()
+# 3.1 变迁的总体比例（基准率）
+mean(vdem_change$regime_change_histname, na.rm = TRUE)
 
-model_bg <- glm(regime_change ~ 
-                  v2x_polyarchy_lag1 + 
-                  e_gdppc_lag1 + 
-                  e_civil_war_lag1 + 
-                  e_pt_coup_lag1 + 
-                  e_peaveduc_lag1,
-                data = vdem_model1,
-                family = binomial(link = "logit"))
-summary(model_bg)
-```
-
-## Visualizing Marginal Effects
-
-```{r}
-plot(allEffects(model1))
-plot(allEffects(model_bg))
-```
-
-## Interpretation
-
-Initial results suggest that lower levels of electoral democracy and active civil conflict significantly increase the likelihood of regime change. However, economic indicators such as GDP and education do not appear to have strong predictive power in this specification.
-
----
-
-# RQ2: What factors influence the establishment of communist regimes?
-
-```{r}
-
-regime_transitions |>
-  filter(str_detect(current_histname, "People's Republic") |
-         str_detect(current_histname, "Socialist Republic") |
-         str_detect(current_histname, "Socialist") |
-         str_detect(current_histname, "Soviet") |
-         str_detect(current_histname, "Democratic People's Republic")) |>
-  arrange(year)
-
-
-communist_keywords <- c("People's Republic", "Socialist Republic", "Socialist", "Soviet", "Democratic People's Republic", "People's Democratic Republic")
-
-regime_transitions |>
-  filter(str_detect(current_histname, str_c(communist_keywords, collapse = "|"))) |>
-  arrange(country_id, year) |>
-  group_by(country_id) |>
-  slice_min(year, n = 1) |> 
-  ungroup() |>
-  arrange(year)
-
+# 3.2 随机看几条发生变迁的记录（是否合理）
+vdem_change %>%
+  filter(regime_change_histname == 1) %>%
+  select(country_name, year, histname) %>%
+  head(10)
 ```
 
 
 
-Georgia Soviet Socialist Republic缺失政体建立前后时期的数据
+把 v2regendtype 的分布看清楚——既看总体分布，也看发生变迁（你用 y_t1_histname==1）时下一年的“结束类型”分布。只做这一步，先不建模。
 
-
-**Next Steps**:
-We will next turn to more specific questions:
-
-- What factors explain the formation of communist regimes?
-- What causes communist regimes to collapse?
-- What drives capitalist regimes to transition into communism?
-
-We will construct new binary regime-type indicators to address these questions in subsequent models.
-
-
-# RQ3: What factors contribute to the collapse of communist regimes?
-
-
-# RQ4: What factors explain the long-term survival of the remaining communist regimes (China, Cuba, Laos, North Korea, and Vietnam)?
-
-
-
-
-
-# EDA
-
-## Test function in `vdemdata` package
 
 ```{r}
-vdemdata::plot_indicator("v2msuffrage")
+#| label: regendtype-distribution
+#| message: false
+library(dplyr)
+library(tidyr)
 
-# Plot V-Dem indicators liberal democracy and egalitarian democracy
-# for Sweden and Germany between 1912 and 2000.
-
-plot_indicator(indicator=c( "v2x_egaldem", "v2x_libdem"), countries = c("Germany", "Sweden"),
-                     min_year = 1912, max_year = 2000)
-```
-
-## What country do we have?
-
-```{r}
-unique(vdem$country_name)
-```
-
-
-Pick out German, Russia and China
-
-```{r}
-selected_data <- vdem |>
-  filter(country_text_id %in% c("DEU", "RUS", "CHN")) |>
-  select(where(~ !any(is.na(.))))
-
-```
-
-```{r}
-
-selected_data |>
-  group_by(country_text_id) |>
-  summarize(
-    years_available = sum(!is.na(v2csreprss)),
-    year_min = min(year[!is.na(v2csreprss)]),
-    year_max = max(year[!is.na(v2csreprss)])
+# 1) 建立代码本（codebook → 标签映射）
+regend_map <- tibble::tibble(
+  v2regendtype = 0:13,
+  regend_label = c(
+    "Military coup d’état",                                   # 0
+    "Coup by non-military groups",                            # 1
+    "Self-coup (autogolpe)",                                  # 2
+    "Assassination of leader (non-coup)",                     # 3
+    "Natural death of leader",                                # 4
+    "Loss in civil war",                                      # 5
+    "Loss in inter-state war",                                # 6
+    "Foreign intervention (non inter-state loss)",            # 7
+    "Popular uprising",                                       # 8
+    "Liberalization/democratization guided by leaders",       # 9
+    "Other directed transformation under leaders",            # 10
+    "Liberalization/democratization w/o leader guidance",     # 11
+    "Other process (not 1–11)",                               # 12
+    "Regime still exists"                                     # 13
   )
+)
+
+# 2) 总体分布（不区分是否发生变迁）
+overall_dist <- vdem_change %>%
+  filter(!is.na(v2regendtype)) %>%
+  count(v2regendtype, name = "n") %>%
+  left_join(regend_map, by = "v2regendtype") %>%
+  mutate(p = n / sum(n)) %>%
+  arrange(v2regendtype)
+
+print(overall_dist)
+
+# 3) 与你的“t→t+1 变迁”对齐：取下一年的结束类型（regend_t1）
+vdem_change <- vdem_change %>%
+  group_by(country_id) %>%
+  mutate(regend_t1 = dplyr::lead(v2regendtype, 1)) %>%
+  ungroup()
+
+# 仅在 y_t1_histname == 1 的行里看分布（且排除 code=13 “still exists”）
+change_event_dist <- vdem_change %>%
+  filter(y_t1_histname == 1, !is.na(regend_t1), regend_t1 != 13) %>%
+  count(regend_t1, name = "n") %>%
+  left_join(regend_map, by = c("regend_t1" = "v2regendtype")) %>%
+  mutate(p = n / sum(n)) %>%
+  arrange(desc(p))
+
+print(change_event_dist)
+
+# 4) 两个极简检查
+n_change_rows <- sum(vdem_change$y_t1_histname == 1, na.rm = TRUE)
+n_labeled_events <- sum(vdem_change$y_t1_histname == 1 & !is.na(vdem_change$regend_t1) & vdem_change$regend_t1 != 13)
+cat("# of t+1 change rows:", n_change_rows, "\n")
+cat("# of t+1 rows with a non-13 end-type label:", n_labeled_events, "\n")
 
 
 ```
 
-```{r}
-ggplot(selected_data, aes(x = year, y = v2csreprss, color = country_text_id)) +
-  geom_point() +
-  labs(
-    title = "CSO Repression Over Time (V-Dem v2csreprss)",
-    x = "Year",
-    y = "Civil Society Repression",
-    color = "Country"
-  ) +
-  scale_color_manual(
-    values = c("DEU" = "black", "RUS" = "red", "CHN" = "blue"),
-    labels = c("Germany", "Russia", "China")
-  ) +
-  theme_minimal()
+```{python}
+#| eval: false
+#| include: false
+import pymc as pm
+
+alpha, beta = 20*0.08, 20*(1-0.08)  # 举例：先验中心8%，等效样本量20 —— 先暂时占位
+with pm.Model() as beta_bern:
+    p_coup = pm.Beta("p_coup", alpha=alpha, beta=beta)        # 顶部：先验参数
+    coup_t1 = pm.Bernoulli("coup_t1", p=p_coup, observed=y)   # 中间+底部：生成+观测
+# 画图（会得到和作业一致的三节点）
+pm.model_to_graphviz(beta_bern)
 
 
 ```
-
-
-
-
 
 ```{=html}
 <script>

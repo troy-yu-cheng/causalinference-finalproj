@@ -1,0 +1,636 @@
+---
+title: "drft"
+format: html
+editor: visual
+---
+
+# RQ: What kinds of factors cause a country to undergo a regime change?
+
+This section explores the historical predictors of regime change using V-Dem's country-year panel data, covering over 200 years and nearly all sovereign states. We operationalize regime change based on transitions in the `histname` field and use logistic regression to assess whether various political, structural, and conflict-related variables can significantly predict the likelihood of a regime shift.
+
+## Import Data and Load Packages
+
+```{r}
+# Install V-Dem data package:
+# install.packages("devtools")
+# devtools::install_github("vdeminstitute/vdemdata")
+
+library(vdemdata)
+library(tidyverse)
+library(effects)
+library(stringr)
+```
+
+
+## Create Regime Change Variable
+
+We define regime change as a change in the `histname` field within a country across years.
+
+```{r}
+vdem_1 <- vdem |> 
+  arrange(country_id, year) |> 
+  group_by(country_id) |> 
+  mutate(regime_change = if_else(histname != lag(histname), 1, 0, missing = 0)) |> 
+  ungroup()
+
+regime_transitions <- vdem_1 |> 
+  arrange(country_id, year) |> 
+  group_by(country_id) |> 
+  mutate(
+    previous_histname = lag(histname),
+    current_histname = histname
+  ) |> 
+  filter(regime_change == 1) |> 
+  select(country_id, country_name, year, previous_histname, current_histname) |> 
+  ungroup()
+
+
+vdem_1 <- vdem_1 %>%
+  group_by(country_name) %>%
+  arrange(year) %>%
+  mutate(
+    regime_change_check = if_else(
+      lag(v2reginfo) != v2reginfo,
+      1, 0
+    ),
+    regime_change_check = replace_na(regime_change_check, 1)  
+  )
+
+table(vdem_1$regime_change, vdem_1$regime_change_check)
+
+```
+
+## Check end type
+
+```{r}
+# 1) 代码-标签对照表（来自代码手册）
+regend_labels <- tibble::tibble(
+  v2regendtype = 0:13,
+  label = c(
+    "Military coup d’état",
+    "Coup by non-military groups",
+    "Self-coup by sitting leader",
+    "Assassination (not a coup)",
+    "Natural death of leader",
+    "Loss in civil war",
+    "Loss in inter-state war",
+    "Foreign intervention (non interstate-loss)",
+    "Popular uprising",
+    "Liberalization/democratization w/ regime guidance",
+    "Other intentional transformation (excl. liberalization)",
+    "Liberalization/democratization w/o regime guidance",
+    "Other process (not 1–11)",
+    "Regime still exists"
+  )
+)
+
+# 2) 取出变量并合并标签
+df_end <- vdem %>%
+  select(country_id, country_name, year, v2regendtype) %>%
+  mutate(v2regendtype = as.integer(v2regendtype)) %>%
+  left_join(regend_labels, by = "v2regendtype")
+
+# 3) 分布（包含“仍在进行”的 13）
+dist_all <- df_end %>%
+  filter(!is.na(v2regendtype)) %>%
+  count(v2regendtype, label, name = "n") %>%
+  mutate(pct = n / sum(n)) %>%
+  arrange(desc(n))
+
+dist_all
+
+ggplot(dist_all,
+       aes(x = fct_reorder(str_trunc(label, 60), n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "v2regendtype: distribution (including 13 = regime still exists)",
+       x = NULL, y = "Count") +
+  theme_minimal(base_size = 12)
+
+# 4) 仅统计“政体已结束”的类型（0–12）
+dist_finished <- df_end %>%
+  filter(!is.na(v2regendtype), v2regendtype %in% 0:12) %>%
+  count(v2regendtype, label, name = "n") %>%
+  mutate(pct = n / sum(n)) %>%
+  arrange(desc(n))
+
+dist_finished
+
+ggplot(dist_finished,
+       aes(x = fct_reorder(str_trunc(label, 60), n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "v2regendtype: distribution among ended regimes (0–12)",
+       x = NULL, y = "Count") +
+  theme_minimal(base_size = 12)
+
+
+```
+
+## Naive Logit Model with Political Indicators
+
+We first test a simple model using three high-level indices:
+- `v2x_corr`: Control of corruption
+- `v2x_polyarchy`: Electoral democracy index
+- `v2x_freexp_altinf`: Freedom of alternative sources of information
+
+```{r}
+vdem_model <- vdem_1 |> 
+  arrange(country_id, year) |> 
+  group_by(country_id) |> 
+  mutate(
+    v2x_corr_lag1 = lag(v2x_corr, 1),
+    v2x_polyarchy_lag1 = lag(v2x_polyarchy, 1),
+    v2x_freexp_altinf_lag1 = lag(v2x_freexp_altinf, 1)
+  ) |> 
+  ungroup()
+
+model1 <- glm(regime_change ~ v2x_corr_lag1 + v2x_polyarchy_lag1 + v2x_freexp_altinf_lag1,
+              data = vdem_model,
+              family = binomial(link = "logit"))
+summary(model1)
+```
+
+## Structural and Background Factors Model
+
+We expand the model to include structural and conflict variables:
+- `e_gdppc`: GDP per capita
+- `e_peaveduc`: Education level (15+)
+- `e_civil_war`: Civil war dummy
+- `e_pt_coup`: Number of coup attempts
+
+```{r}
+vdem_model1 <- vdem_model |>
+  arrange(country_id, year) |>
+  group_by(country_id) |>
+  mutate(
+    e_gdppc_lag1 = lag(e_gdppc),
+    e_peaveduc_lag1 = lag(e_peaveduc),
+    e_civil_war_lag1 = lag(e_civil_war),
+    e_pt_coup_lag1 = lag(e_pt_coup),
+    e_total_oil_income_pc_lag1 = lag(e_total_oil_income_pc)
+  ) |>
+  ungroup()
+
+model_bg <- glm(regime_change ~ 
+                  v2x_polyarchy_lag1 + 
+                  e_gdppc_lag1 + 
+                  e_civil_war_lag1 + 
+                  e_pt_coup_lag1 + 
+                  e_peaveduc_lag1,
+                data = vdem_model1,
+                family = binomial(link = "logit"))
+summary(model_bg)
+```
+
+## Visualizing Marginal Effects
+
+```{r}
+plot(allEffects(model1))
+plot(allEffects(model_bg))
+```
+
+## Interpretation
+
+Initial results suggest that lower levels of electoral democracy and active civil conflict significantly increase the likelihood of regime change. However, economic indicators such as GDP and education do not appear to have strong predictive power in this specification.
+
+---
+
+# RQ2: What factors influence the establishment of communist regimes?
+
+To answer this question, we need to define "communist regimes" first. Is "communist" "socialist"? Or it contains other potential meanings? This is the mischievous Mike in this study.
+
+
+```{r}
+
+vdem$v2reginfo
+```
+
+
+```{r}
+
+regime_transitions |>
+  filter(str_detect(current_histname, "People's Republic") |
+         str_detect(current_histname, "Socialist Republic") |
+         str_detect(current_histname, "Socialist") |
+         str_detect(current_histname, "Soviet") |
+         str_detect(current_histname, "Democratic People's Republic")) |>
+  arrange(year)
+
+
+communist_keywords <- c("People's Republic", "Socialist Republic", "Socialist", "Soviet", "Democratic People's Republic", "People's Democratic Republic")
+
+regime_transitions |>
+  filter(str_detect(current_histname, str_c(communist_keywords, collapse = "|"))) |>
+  arrange(country_id, year) |>
+  group_by(country_id) |>
+  slice_min(year, n = 1) |> 
+  ungroup() |>
+  arrange(year)
+
+```
+
+
+
+Georgia Soviet Socialist Republic缺失政体建立前后时期的数据
+
+
+**Next Steps**:
+We will next turn to more specific questions:
+
+- What factors explain the formation of communist regimes?
+- What causes communist regimes to collapse?
+- What drives capitalist regimes to transition into communism?
+
+We will construct new binary regime-type indicators to address these questions in subsequent models.
+
+
+# RQ3: What factors contribute to the collapse of communist regimes?
+
+
+# RQ4: What factors explain the long-term survival of the remaining communist regimes (China, Cuba, Laos, North Korea, and Vietnam)?
+
+
+
+
+
+# EDA
+
+## Test function in `vdemdata` package
+
+```{r}
+vdemdata::plot_indicator("v2msuffrage")
+
+# Plot V-Dem indicators liberal democracy and egalitarian democracy
+# for Sweden and Germany between 1912 and 2000.
+
+plot_indicator(indicator=c( "v2x_egaldem", "v2x_libdem"), countries = c("Germany", "Sweden"),
+                     min_year = 1912, max_year = 2000)
+```
+
+## What country do we have?
+
+```{r}
+unique(vdem$country_name)
+```
+
+
+Pick out German, Russia and China
+
+```{r}
+selected_data <- vdem |>
+  filter(country_text_id %in% c("DEU", "RUS", "CHN")) |>
+  select(where(~ !any(is.na(.))))
+
+```
+
+```{r}
+
+selected_data |>
+  group_by(country_text_id) |>
+  summarize(
+    years_available = sum(!is.na(v2csreprss)),
+    year_min = min(year[!is.na(v2csreprss)]),
+    year_max = max(year[!is.na(v2csreprss)])
+  )
+
+
+```
+
+```{r}
+ggplot(selected_data, aes(x = year, y = v2csreprss, color = country_text_id)) +
+  geom_point() +
+  labs(
+    title = "CSO Repression Over Time (V-Dem v2csreprss)",
+    x = "Year",
+    y = "Civil Society Repression",
+    color = "Country"
+  ) +
+  scale_color_manual(
+    values = c("DEU" = "black", "RUS" = "red", "CHN" = "blue"),
+    labels = c("Germany", "Russia", "China")
+  ) +
+  theme_minimal()
+
+
+```
+
+
+
+# MVP
+
+
+```{r}
+#| label: prep-episodes
+#| warning: false
+library(dplyr)
+library(stringr)
+# 假设你已经有 vdem 数据框（vdemdata 包或你自己的读取方式）
+# 必需列：country_id, country_name, year, histname, v2regendtype,
+#        e_civil_war, e_miinteco, e_miinterc, e_pt_coup, e_pt_coup_attempts
+
+# 1) episode 划分：histname 变化即新政体
+vdem_ep <- vdem %>%
+  arrange(country_id, year) %>%
+  group_by(country_id) %>%
+  mutate(ep_break = if_else(histname != lag(histname), 1L, 0L, missing = 1L),
+         regime_ep = cumsum(ep_break)) %>%
+  ungroup()
+
+# 2) 每个 episode 的结束类型（该政体最后一年的 v2regendtype）
+ep_summary <- vdem_ep %>%
+  group_by(country_id, regime_ep) %>%
+  summarize(
+    # 不再带 country_name，避免重名
+    histname_ep  = last(histname),
+    year_start   = min(year, na.rm = TRUE),
+    year_end     = max(year, na.rm = TRUE),
+    end_type_raw = v2regendtype[which.max(year)],
+    .groups = "drop"
+  )
+
+# 3) 合并类别：把 0–12 合为若干“机制桶”，13=仍然存在
+collapse_endtype <- function(x){
+  dplyr::case_when(
+    x %in% c(0,1,2,3) ~ "coup/assassination", # 政变/刺杀/自我政变
+    x %in% c(5,6,7)   ~ "war_loss/foreign_intervention", # 内战失败/对外战败/外部干预
+    x %in% c(8)       ~ "popular_uprising", # 群众起义
+    x %in% c(9,11)    ~ "liberalization/democratization",# 自由化/民主化
+    x %in% c(10,12)   ~ "other_transformation",          # 其他制度性转型
+    x %in% c(4)       ~ "leader_natural_death",          # 领袖自然死亡（可选）
+    x %in% c(13)      ~ "still_exists",                  # 仍在进行
+    TRUE              ~ NA_character_
+  )
+}
+ep_summary <- ep_summary %>%
+  mutate(end_bucket = collapse_endtype(end_type_raw))
+
+# 4) 回填到每年，用于构造滞后自变量（并标注episode内时长）
+vdem_ep <- vdem_ep %>%
+  left_join(ep_summary, by = c("country_id","regime_ep")) %>%
+  group_by(country_id, regime_ep) %>%
+  mutate(
+    t_in_ep = year - min(year) + 1L,
+    is_last = year == max(year),
+    # 该年是否真正结束（排除13）
+    end_any = as.integer(is_last & !is.na(end_bucket) & end_bucket != "still_exists")
+  ) %>%
+  ungroup()
+
+# 5) 构造自变量（滞后1年）
+panel <- vdem_ep %>%
+  arrange(country_id, year) %>%
+  group_by(country_id) %>%
+  mutate(
+    civil_lag1   = lag(e_civil_war, 1),
+    intl_lag1    = lag(e_miinteco, 1),      # 国际武装冲突
+    internal_lag1= lag(e_miinterc, 1),      # 国内武装冲突
+    coup_lag1    = lag(e_pt_coup, 1),
+    attempts_lag1= lag(e_pt_coup_attempts, 1)
+  ) %>%
+  ungroup()
+
+# 6) 只保留“结束那一年”的观测来做多项分类（预测*哪种*结束方式）
+train_df <- panel %>%
+  filter(is_last, !is.na(end_bucket), end_bucket != "still_exists") %>%
+  select(country_id, country_name, year, end_bucket,
+         civil_lag1, intl_lag1, internal_lag1, coup_lag1, attempts_lag1) %>%
+  tidyr::drop_na()
+
+# 保存类别基准顺序（把最高频类别放前面作为 baseline）
+tab <- sort(table(train_df$end_bucket), decreasing = TRUE)
+cat_levels <- names(tab)
+train_df$end_bucket <- factor(train_df$end_bucket, levels = cat_levels)
+
+# 先验用的历史分布（经验频率：所有年所有国家）
+prior_counts <- as.numeric(tab)
+prior_probs  <- prior_counts / sum(prior_counts)
+
+# 写到磁盘（给 PyMC 用）
+write.csv(train_df, "ep_model.csv", row.names = FALSE)
+write.csv(data.frame(cat = cat_levels,
+                     count = prior_counts,
+                     prob  = prior_probs),
+          "ep_prior.csv", row.names = FALSE)
+
+
+```
+```{r}
+library(reticulate)
+
+# 确认当前使用的 Python（你截图显示的是 uv 虚拟环境）
+reticulate::py_config()
+
+# 直接在“当前环境”里装需要的包
+# 如果你已经有了 numpy 2.x，但后面某些包报兼容问题，
+# 可以把 numpy 固定到 1.26.4（见下方注释行）
+reticulate::py_install(
+  c(
+    "pandas",
+    "pymc",
+    "arviz",
+    "matplotlib",
+    "scipy",
+    "pytensor",
+    "aesara"
+    # ,"numpy==1.26.4"  # 只有出现兼容问题时再解注释降级
+  ),
+  pip = TRUE
+)
+
+# 装完测试
+reticulate::py_run_string("
+import sys
+print(sys.version)
+import numpy as np, pandas as pd
+import pymc as pm, arviz as az
+print('numpy', np.__version__)
+print('pandas', pd.__version__)
+print('pymc', pm.__version__)
+print('arviz', az.__version__)
+")
+
+
+```
+
+```{python}
+
+#| label: pymc-fit
+#| engine: python
+#| warning: false
+import numpy as np
+import pandas as pd
+import pymc as pm
+import pytensor.tensor as pt
+import arviz as az
+
+# 1) 读取 R 导出的两份数据
+df  = pd.read_csv("ep_model.csv")     # 每个 episode 的“结束那一年” + 滞后自变量
+pri = pd.read_csv("ep_prior.csv")     # 从历史频率来的“信息性先验”
+
+# 2) 类别与先验
+cats     = list(pri["cat"])
+K        = len(cats)
+prior_p  = pri["prob"].values.astype("float64")   # 历史分布（经验概率）
+baseline = cats[0]                                # 最高频类别作为 baseline（与 prior.csv 顺序一致）
+
+# 3) y -> 0..K-1
+cat_to_idx = {c:i for i,c in enumerate(cats)}
+y = df["end_bucket"].map(cat_to_idx).values
+# 若数据里有没出现在 cats 中的类别，会得到 NaN；这里保护一下
+mask = ~np.isnan(y)
+y = y[mask].astype("int64")
+
+# 4) 设计矩阵（标准化；并与 y 对齐）
+X_cols = ["civil_lag1","intl_lag1","internal_lag1","coup_lag1","attempts_lag1"]
+X_raw = df.loc[mask, X_cols].astype(float).values
+X = (X_raw - X_raw.mean(axis=0)) / X_raw.std(axis=0)
+X = X.astype(pm.floatX)     # 与后端 dtype 对齐
+
+N, P = X.shape
+
+# 5) 先验中心：将经验概率转为相对 baseline 的 log-odds 中心
+log_p = np.log(prior_p + 1e-12)           # 数值稳定
+base_idx = 0
+prior_alpha_center = (log_p[1:] - log_p[base_idx]).astype(pm.floatX)   # 对 K-1 个非基类
+
+# 兼容：老版本用 pm.Data，新版本用 pm.MutableData
+Data = getattr(pm, "MutableData", pm.Data)
+
+with pm.Model() as mdl:
+    Xd = Data("X", X)
+    yd = Data("y_obs", y)
+
+    alpha = pm.Normal("alpha", mu=prior_alpha_center, sigma=0.75, shape=K-1)
+    beta  = pm.Normal("beta",  mu=0.0, sigma=1.0,    shape=(P, K-1))
+
+    linpred_nb = pt.dot(Xd, beta) + alpha
+    linpred = pt.concatenate([pt.zeros((N,1), dtype=linpred_nb.dtype), linpred_nb], axis=1)
+
+    # 两种写法二选一 —— 你的版本如果支持，用 logit_p 更稳：
+    # y_like = pm.Categorical("y", logit_p=linpred, observed=yd)
+    p = pm.math.softmax(linpred)
+    y_like = pm.Categorical("y", p=p, observed=yd)
+
+    idata = pm.sample(2000, tune=2000, chains=4, target_accept=0.9, random_seed=5650)
+
+
+# 12) 汇总
+az.summary(idata, var_names=["alpha","beta"], round_to=3)
+
+
+```
+
+```{python}
+print(np.unique(y))
+print(np.min(y), np.max(y))
+print(np.isnan(y).sum())
+print(np.isnan(X).sum(axis=0))      # 每列 NaN 个数
+print(X.std(axis=0))                # 零方差会出问题
+```
+```{python}
+
+# 1) 温和化先验（防止极端概率导致 log-odds 太大）
+eps = 1e-4
+prior_p = np.clip(prior_p, eps, 1)
+prior_p = prior_p / prior_p.sum()
+
+log_p = np.log(prior_p)
+base_idx = 0                          # 把第 1 类当 baseline
+prior_alpha_center = log_p[1:] - log_p[base_idx]
+print("prior_p:", prior_p.round(4))
+print("prior_alpha_center:", prior_alpha_center.round(3))
+
+# 2) 建模：pm.Data + 稳定 softmax + ADVI 初始化
+N, P = X.shape
+K     = len(prior_p)
+
+with pm.Model() as mdl:
+    Xd = pm.Data("X", X)
+    yd = pm.Data("y_obs", y)
+
+    # 截距（K-1 个，基类的截距为 0）
+    alpha = pm.Normal("alpha", mu=prior_alpha_center, sigma=2.0, shape=K-1)
+    # 每个非基类一组系数
+    beta  = pm.Normal("beta",  mu=0.0, sigma=2.0, shape=(P, K-1))
+
+    # 线性预测
+    linpred_nb = pt.dot(Xd, beta) + alpha                     # (N, K-1)
+    linpred    = pt.concatenate([pt.zeros((N,1), dtype=linpred_nb.dtype), linpred_nb], axis=1)
+
+    # 数值稳定的 softmax（减去每行最大值）
+    linpred_shift = linpred - pt.max(linpred, axis=1, keepdims=True)
+    p = pm.math.softmax(linpred_shift)
+
+    y_like = pm.Categorical("y", p=p, observed=yd)
+
+    # 用 ADVI 找初值
+    approx = pm.fit(10_000, method="advi", progressbar=True)
+    idata  = pm.sample(
+        1500, tune=1500, chains=2, target_accept=0.9,
+        initvals=approx.sample(1), progressbar=True
+    )
+
+```
+
+```{python}
+import numpy as np
+import pandas as pd
+import pymc as pm
+import arviz as az
+
+# 读入你刚刚导出的两份 csv
+df  = pd.read_csv("ep_model.csv")     # 有 end_bucket
+pri = pd.read_csv("ep_prior.csv")     # 有 cat, prob
+
+# 类别顺序与映射（确保和 ep_prior 一致）
+cats = list(pri["cat"])
+cat_to_idx = {c:i for i,c in enumerate(cats)}
+y = df["end_bucket"].map(cat_to_idx).to_numpy()
+
+# Dirichlet 先验强度（相当于伪计数）：可以调大/调小
+strength = 50.0
+alpha = strength * pri["prob"].to_numpy() + 1e-6   # 防止 0
+
+with pm.Model() as m0:
+    theta = pm.Dirichlet("theta", a=alpha)
+    y_obs = pm.Categorical("y", p=theta, observed=y)
+    idata0 = pm.sample(2000, tune=2000, chains=2, target_accept=0.9, random_seed=5650)
+
+print(az.summary(idata0, var_names=["theta"]))
+
+```
+
+```{python}
+# 如果你之前已经建好了 baseline 模型，就直接用你那个变量名
+# 这里给一个最小可复现的 baseline 模型（只有 Dirichlet + Categorical）
+
+import numpy as np
+import pandas as pd
+import pymc as pm
+
+# 读你之前导出的 y（也可以复用内存里的 y）
+df = pd.read_csv("ep_model.csv")            # 确保这个文件在工作目录
+cats = sorted(df["end_bucket"].dropna().unique())
+cat_to_idx = {c:i for i,c in enumerate(cats)}
+y = df["end_bucket"].map(cat_to_idx).values
+
+K = len(cats)
+
+with pm.Model() as mdl_baseline:
+    theta = pm.Dirichlet("theta", a=np.ones(K))
+    y_obs = pm.Categorical("y", p=theta, observed=y)
+
+# ⭐ 关键：用 model_to_graphviz() 生成 PGM
+g = pm.model_to_graphviz(mdl_baseline)
+g  # 在 RStudio/Quarto 里会内联显示
+
+```
+
+```{python}
+import sys, platform
+print("PY:", sys.executable)
+print("VER:", platform.python_version())
+
+```
+
