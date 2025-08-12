@@ -4,6 +4,13 @@ format: html
 editor: visual
 ---
 
+
+The analysis is guided by four core research questions:
+
+RQ: What kinds of factors cause a country to undergo a regime change?
+
+We study macro-political transformations with a causal lens. The unit is country–year. To avoid temporal leakage, the outcome is whether a regime change occurs in year t+1 given information available by the end of year t. We use V-Dem for yearly indicators. Conceptually, we posit that shocks (economic, conflict), mobilization (protest), repression, and institutional constraints shape the hazard of regime change, with possible unobserved country-level traits.
+
 # RQ: What kinds of factors cause a country to undergo a regime change?
 
 This section explores the historical predictors of regime change using V-Dem's country-year panel data, covering over 200 years and nearly all sovereign states. We operationalize regime change based on transitions in the `histname` field and use logistic regression to assess whether various political, structural, and conflict-related variables can significantly predict the likelihood of a regime shift.
