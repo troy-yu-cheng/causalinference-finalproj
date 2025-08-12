@@ -47,13 +47,21 @@ if (length(miss)) {
 
 ```
 
-# Note
-
-Hi Prof. Jeff, I have some issues regarding to rendering LaTex. I'll fix it in next three hours. Thx for your patience!
-
 # Introduction
 
-Understanding why regimes endure or break down is a core question in comparative politics. This project takes a **design-based causal approach** to ask whether conditions observed in year *t* make a **coup termination** of the regime more likely in year *t+1*. We leverage the [**Varieties of Democracy (V-Dem)**](https://www.v-dem.net/) country–year panel, which provides globally comparable annual indicators since the eighteenth century, and we align predictors to year *t* and outcomes to year *t+1* to avoid temporal leakage. Our focus is intentionally narrow: do **coup attempts in year** *t* raise the short-run risk that a regime ends **via a coup** next year, once we account for country heterogeneity and time-varying turmoil?
+Understanding why regimes endure or break down is a core question in comparative politics. This project takes a **design-based causal approach** to ask whether conditions observed in year *t* make a **coup termination** of the regime more likely in year *t+1*. We leverage the [**Varieties of Democracy (V-Dem)**](https://doi.org/10.23696/vdemds25) country–year panel, which provides globally comparable annual indicators since the eighteenth century, and we align predictors to year *t* and outcomes to year *t+1* to avoid temporal leakage. Our focus is intentionally narrow: do **coup attempts in year** *t* raise the short-run risk that a regime ends **via a coup** next year, once we account for country heterogeneity and time-varying turmoil?
+
+Our project builds on three strands. First, work on coups documents their incidence, correlates, and consequences, showing that attempts arise from elite coordination problems and are shaped by military cohesion, repression, and institutional constraints ([Powell & Thyne, 2011](https://doi.org/10.1177/0022343310397436); [Geddes, Wright, & Frantz, 2014](https://doi.org/10.1017/S1537592714000851)). Second, theories of authoritarian politics emphasize power-sharing and ruler–elite bargaining, which structure both the incentives to attempt coups and the conditions under which they succeed ([Svolik, 2012](https://doi.org/10.1017/CBO9781139176040)). Third, research on political instability and civil conflict demonstrates that mass contention and organized violence alter regime vulnerability and the payoff to elite defection, while global trends in the post–Cold War era contributed to a secular decline in coups ([Goldstone et al., 2010](https://doi.org/10.1111/j.1540-5907.2009.00426.x); [Hegre et al., 2013](https://doi.org/10.1111/isqu.12007)).
+
+Methodologically, we follow the identification playbook that warns against post-treatment conditioning and collider bias and recommends design-based adjustments and transparent estimands ([Pearl, 2009](https://doi.org/10.1017/CBO9780511803161)). We also heed guidance for rare-events logistic regression when interpreting odds ratios in sparse outcomes ([King & Zeng, 2001](https://doi.org/10.1093/oxfordjournals.pan.a004868)). For implementation, we rely on the V-Dem country–year panel ([Coppedge et al., various years](https://www.v-dem.net/data/the-v-dem-dataset/)) and estimate mixed-effects models using the `glmmTMB` framework ([Brooks et al., 2017](https://journal.r-project.org/archive/2017/RJ-2017-066/index.html)). To guard against separation in high-dimensional fixed-effects logit, we cross-check with bias-reduced estimation in the spirit of [Firth (1993)](https://doi.org/10.1093/biomet/80.1.27).
+
+## Data and variables
+
+We use the Varieties of Democracy (V-Dem) country–year panel. The unit of analysis is the country–year. Three variables anchor measurement. First, `v2regendtype` encodes how a regime ends in a given year; we treat values 0, 1, and 2 as coup terminations (military coup, non-military coup, self-coup) and treat all other non-missing values—including “regime still exists” (13)—as non-coup. This choice lets us define an outcome for all country–years in year $t+1$ and, crucially, avoids conditioning on whether a regime ends. Second, [`e_pt_coup_attempts`](https://doi.org/10.1177/0010414019879953) records the count of coup attempts in year $t$; we define the treatment as an indicator that at least one attempt occurred ($A_t=1$ if \>0, otherwise $0$). Coverage for attempts is strongest after 1950, so the effective sample reflects that period. Third, we include `e_civil_war` as a salient time-varying confounder that plausibly increases both the probability of attempts and the probability that a termination, if it occurs, takes the form of a coup. For descriptive context we also standardize and compare `histname` across adjacent years within a country to summarize institutional churn, but we do not condition on `histname` changes in the causal models.
+
+The design aligns predictors to year $t$ and defines the outcome for year $t+1$ for every country–year: $Y^*_{t+1}=1$ if `v2regendtype_{t+1} ∈ {0,1,2}` and $0$ otherwise. This specification addresses a common source of bias: if one first restricts attention to country–years where the regime ends in $t+1$ and then models “coup vs. non-coup” among those cases, the conditioning event acts as a collider for many time-varying forces (e.g., civil war, protest, elite fractures), inducing spurious associations with the coup outcome. By modeling the marginal probability of coup termination next year for the full panel, we avoid this collider while keeping the estimand directly interpretable.
+
+Identification relies on absorbing stable cross-country differences with country effects (either fixed effects or a random intercept), absorbing global and period-specific shocks with year fixed effects, and adjusting for a time-varying confounder (civil war). Under temporal ordering (predictors at $t$, outcome at $t+1$), conditional ignorability given ${U_i, W_t, C_t}$, overlap (within-country variation in attempts), and SUTVA, the contrasts we report can be interpreted as conditional average treatment effects of an attempt on the next-year probability of coup termination.
 
 ## Identification and Estimand
 
@@ -69,51 +77,11 @@ $$
 
 We estimate this quantity using logit specifications with (a) country and year fixed effects and clustered standard errors, and (b) a mixed-effects logit with a country random intercept and year fixed effects. For interpretability, we report both **odds ratios (OR)** and **average risk differences** via **g-computation**, i.e., predicting $P(Y^*_{t+1}=1)$ for the same observations under $A_t=1$ and $A_t=0$ and averaging the difference.
 
-## Data and variables
+The estimand is short-run and conditional: the effect of an attempt in $t$ on the probability of a coup termination in $t+1$, averaging within countries after absorbing country and year structure and controlling for civil war. It does not capture slower dynamics (e.g., how attempts reshape elite coalitions over several years) or feedback loops between conflict and coup risk. Coding accuracy and coverage in the underlying data further bound external validity. For these reasons we emphasize risk differences—in percentage points—as the primary quantity for substantive interpretation, with odds ratios as complementary evidence about direction and proportional change.
 
-We use the V-Dem country–year panel. The unit is country–year. Core variables:
+## Estimation methodology
 
--   `histname`: historical label of the political entity; used to track within-country regime continuity.
--   `v2regendtype`: code describing **how** a regime ends in a year (e.g., military coup `0`, non-military coup `1`, self-coup `2`, “still exists” `13`).
--   `e_pt_coup_attempts`: count of recorded coup attempts in the year (available for the post-1950 period).
--   `e_civil_war`: indicator of civil war in the year (time-varying confounder).
--   `country_id`, `year`: panel identifiers.
-
-We keep observations where these inputs are available and align predictors to year (t) and outcomes to year (t{+}1).
-
-## Measurement and construction
-
-1.  **Within-country change flag.** Standardize `histname` (lowercase, trim whitespace) and mark a change when it differs from the previous year within the same country. This is a descriptive check of regime churn.
-2.  **Next-year end type.** Create `regend_t1 = lead(v2regendtype, 1)` to align end types to (t{+}1).
-3.  **Outcome.** Define (Y\^\*\_{t+1}=1) if `regend_t1 ∈ {0,1,2}` (ends via a coup) and (0) for all other non-missing codes, including `13` “still exists.” This avoids conditioning on the event of ending.
-4.  **Treatment.** Define (A_t=1) if `e_pt_coup_attempts > 0`, else (0). We restrict to years where attempts are recorded (mainly 1950+).
-5.  **Checks.** Report the base rate (\mathbb{E}\[Y\^\*\_{t+1}\]) and the split of (A_t\in{0,1}) to verify rarity and overlap.
-
-## Design diagnostics (descriptive priors)
-
-Before modeling, we tabulate the distribution of `v2regendtype` overall and among rows that precede a `histname` change. These tables are **descriptive priors** only (e.g., coups are rare relative to other endings). We also show an unadjusted split of (Y\^\*\_{t+1}) by (A_t) to illustrate the raw association that the causal design will later adjust.
-
-## Estimation strategy
-
-We target the conditional average treatment effect of (A_t) on (Y\^\*\_{t+1}) under temporal ordering, ignorability given ({U_i,W_t,C_t}), overlap, and SUTVA. Concretely:
-
--   **Model 1 (FE logit).** Logit with **country fixed effects** and **year fixed effects**; cluster standard errors by country.
--   **Model 2 (RE logit + year FE).** Mixed-effects logit with a **country random intercept** and **year fixed effects** (partial pooling across countries).
--   **Model 3 (+ civil war).** Extend Model 2 by adding `e_civil_war` as a time-varying confounder (C_t).
-
-For interpretability we report (i) **odds ratios (OR)** for `attempt`, with 95% CIs; and (ii) **average risk differences** via **g-computation**: predict (P(Y\^\*\_{t+1}=1)) for each row under (A_t{=}1) and (A_t{=}0), then average the difference. If high-dimensional FE causes (quasi-)separation, we note a penalized alternative (e.g., Firth logit or `glmmTMB`) in the Appendix.
-
-## Scope, interpretation, and limitations
-
-Effects are **short-run** ((t \rightarrow t{+}1)) and **conditional** on the adjustment set. They do not capture long-run dynamics or feedback between attempts and conflict. Uncertainty is non-trivial because both coup attempts and coup terminations are rare. Identification assumes no important time-varying confounders beyond country/year effects and civil war, and consistent coding in V-Dem.
-
-## Roadmap
-
-1)  Describe end-type frequencies (descriptive priors).\
-2)  Construct (Y\^\*\_{t+1}) and (A_t); show an unadjusted split.\
-3)  Estimate the FE logit and report OR and g-computed risk difference.\
-4)  Replicate with a random-intercept logit (year FE), then add civil war.\
-5)  Summarize the treatment effect and discuss robustness and limitations.
+We estimate three specifications. (1) A logistic regression with country fixed effects and year fixed effects; standard errors are clustered by country. (2) A mixed-effects logistic model with a country random intercept and year fixed effects, which partially pools information across countries. (3) The mixed-effects model augmented with the civil-war indicator as a time-varying covariate. Alongside odds ratios for the attempt coefficient with 95% confidence intervals, we report average risk differences via g-computation: we predict $P(Y^*_{t+1}=1)$ for each observation twice—once setting $A_t=1$ and once setting $A_t=0$—and average the difference. Because coup terminations are rare and high-dimensional fixed effects can induce quasi-separation, we view penalized or shrinkage alternatives (e.g., Firth-penalized logit; mixed models estimated via `glmmTMB`) as robustness checks rather than primary estimates.
 
 # Load Packages
 
@@ -138,22 +106,13 @@ library(lme4)
 library(vdemdata)
 ```
 
-# Operationalizing Regime Change
+# Measurement strategy and temporal alignment
 
-V-Dem provides multiple regime identifiers. The variable `v2reginfo` splits a political entity into fine-grained historical phases (e.g., “Soviet Russia,” “USSR under Stalin,” “Post-Stalin USSR”). For this study we adopt a **coarser, state-centered** notion of regime continuity and define regime change using `histname`: a country experiences a change when `histname` differs across adjacent years. This choice treats leader-centered episodes as continuity but flags foundational transformations that coincide with refounding, merger, or dissolution.
+V-Dem provides several ways to represent regime continuity and rupture. In this study we adopt a **state-centered** measure. Specifically, within each country we standardize `histname` and mark a **regime change in year t** when the standardized value differs from year t−1. This definition treats leadership rotations and intra-regime phases as continuity, while capturing foundational transformations (refounding, mergers, dissolutions). To prepare a prediction task that avoids temporal leakage, we also shift the indicator forward by one year so that subsequent models use information from year t to **predict change at t+1**.
 
-To study *how* regimes end, we use `v2regendtype`—V-Dem’s coding of the process judged most important for ending the regime in a given year. Codes `0`, `1`, and `2` correspond to **military coup**, **non-military coup**, and **self-coup**, respectively; `13` denotes “regime still exists.” For predictive work and to avoid conditioning on future outcomes, we construct two derived variables:
+## Construct within-country change and a t→t+1 target
 
--   (Y\^\*\_{t+1}): an indicator that the **next year’s** regime termination (if any) ends **via a coup**, i.e., `v2regendtype_{t+1} ∈ {0,1,2}` (coded 1). All non-missing non-coup endings—including “still exists” (`13`)—are coded 0.
--   (A_t): an indicator that **at least one coup attempt** is recorded in year (t), based on `e_pt_coup_attempts` (1 if \>0, 0 if =0).
-
-This construction avoids a common collider: conditioning on the event “the regime ends” in year (t{+}1). Instead of modelling (Y\_{t+1} \mid E\_{t+1}=1), we model the marginal probability of a **coup termination next year** and ask whether (A_t) shifts that probability.
-
-As a descriptive prior, we first examine the marginal distribution of `v2regendtype` and the distribution conditional on `histname` changes. These summaries inform prior beliefs but are not used as conditioning variables in the causal model.
-
-## Descriptive priors from `v2regendtype`
-
-Before modelling, we summarize how regimes end in V-Dem—both overall and among years that precede a `histname` change. These tables are descriptive only; they provide useful priors (e.g., coups are rare relative to other endings).
+The block below (i) standardizes `histname`, (ii) flags a within-country change in year t, and (iii) builds an aligned indicator for **change next year**. This alignment is crucial because all covariates we will use reside at year t.
 
 ```{r}
 #| label: make-regime-change
@@ -181,9 +140,7 @@ vdem_change <- vdem_change %>%
 
 ```
 
-**How to read the output below.**\
-- The mean of `regime_change_histname` is the **base rate** of within-country “histname” changes—useful as a rarity check.\
-- The sample rows help verify that flagged changes correspond to visible `histname` shifts (spot-check only).
+Next, we report the base rate of within-country changes to calibrate rarity. We also spot-check a handful of flagged rows to verify that detected changes correspond to visible histname shifts. These are sanity checks only; they are not part of the causal design.
 
 ```{r}
 # Overall rate of regime change (baseline rate)
@@ -197,9 +154,13 @@ vdem_change %>%
 
 ```
 
-## Distribution of regime end types (`v2regendtype`)
+## Descriptive priors from *v2regendtype*
 
-Next, we summarize how regimes end in V-Dem—overall and among observations that precede a `histname` change (aligned to (t{+}1)). These tables provide **descriptive priors** about the relative frequency of coup vs. non-coup endings. Note that code `13` means “still exists”; I treat it as a **non-coup** when building the causal outcome later, to avoid conditioning on the event of ending.
+While `histname` identifies whether institutional rupture occurs, `v2regendtype` indicates how a regime ends in a given year. To keep the temporal alignment, we define `regend_t1` as the next year’s end-type code. This lets us later build an outcome for all country–years: whether the regime ends via a coup at t+1. Before moving to causal models, it is informative to examine the marginal distribution of end types and the distribution among observations that precede a `histname` change. These summaries serve as descriptive priors about mechanisms and base rates; they are not used as conditioning variables in the causal stage.
+
+## Summarize end-type distributions
+
+The block below (i) maps numeric end-type codes to labels, (ii) reports the overall distribution, (iii) aligns to t+1 by creating `regend_t1`, and (iv) summarizes end-types among rows that precede a `histname` change (excluding `13 = still exists` for that table). Two counts at the end verify how many t+1 change rows exist and how many have a non-13 label.
 
 ```{r}
 #| label: regendtype-distribution
@@ -236,13 +197,13 @@ overall_dist <- vdem_change %>%
 
 print(overall_dist)
 
-# Align with the t→t+1 design: take next year's end type (regend_t1)
+# Align with the t → t+1 design: take next year's end type (regend_t1)
 vdem_change <- vdem_change %>%
   group_by(country_id) %>%
   mutate(regend_t1 = dplyr::lead(v2regendtype, 1)) %>%
   ungroup()
 
-# Look only where y_t1_histname == 1; exclude code=13 (“still exists”)
+# Among rows that precede a histname change at t+1; exclude code=13 ("still exists")
 change_event_dist <- vdem_change %>%
   filter(y_t1_histname == 1, !is.na(regend_t1), regend_t1 != 13) %>%
   count(regend_t1, name = "n") %>%
@@ -252,7 +213,7 @@ change_event_dist <- vdem_change %>%
 
 print(change_event_dist)
 
-# checks
+# Simple checks for alignment and coverage
 n_change_rows <- sum(vdem_change$y_t1_histname == 1, na.rm = TRUE)
 n_labeled_events <- sum(vdem_change$y_t1_histname == 1 & !is.na(vdem_change$regend_t1) & vdem_change$regend_t1 != 13)
 cat("# of t+1 change rows:", n_change_rows, "\n")
@@ -260,18 +221,15 @@ cat("# of t+1 rows with a non-13 end-type label:", n_labeled_events, "\n")
 
 ```
 
-**What to look for.**\
-- Overall, “still exists” (`13`) should be common; **coup endings** `{0,1,2}` are comparatively rare.\
-- Among rows with a `histname` change (aligned to (t{+}1)), the mix of end types provides intuition for later priors.\
-- These are summaries only; the causal analysis will **not** condition on termination itself to avoid collider bias.
+Two patterns matter for what follows. First, “regime still exists” (code `13`) is common, whereas coup endings `{0,1,2}` are rare. This anchors prior beliefs and alerts us to class imbalance. Second, among observations that precede a `histname` change, the mix of termination mechanisms provides context for the later coup-vs-non-coup outcome. Importantly, these are descriptive. In the causal analysis we will not condition on “ending” at t+1, precisely to avoid collider bias. Instead, we will define an outcome for all rows—coup termination next year—and ask whether attempts at year t increase that probability after appropriate adjustment.
 
-# Causal pipeline
+# From measurement to identification
 
-We now switch from descriptive summaries to a causal design. The outcome is defined for **all** country–years: whether the regime ends **via a coup** in the next year (t{+}1). The treatment is whether there is **at least one coup attempt** in year (t). This avoids conditioning on termination and lets us interpret changes **within countries over time**, after adjusting for country and year effects and a time-varying confounder (civil war).
+Building on the measurement choices above, we now move from descriptive context to a **design-based causal analysis**. The key move is to define an outcome for **all** country–years—“coup termination next year”—and to align the treatment at year $t$. This avoids conditioning on whether a regime ends in $t+1$, which would otherwise introduce selection bias.
 
-## Constructing the outcome and the treatment
+## Outcome and treatment
 
-We map `v2regendtype_{t+1} ∈ {0,1,2}` to (Y\^\*\_{t+1}=1) (coup termination next year) and all other non-missing codes—including “still exists” (`13`)—to 0. For the treatment, we use `e_pt_coup_attempts_t>0`. we also record a weakly informative prior for the base rate via the sample mean.
+We map `v2regendtype_{t+1} ∈ {0,1,2}` to $Y^{\star}_{t+1}=1$ (coup termination next year) and **all other non-missing codes**—including “still exists” (`13`)—to $0$. The treatment is $A_t=\mathbb{1}\{\text{attempts}_t>0\}$, where $\text{attempts}_t$ refers to the V-Dem count `e_pt_coup_attempts` in year $t$. Because attempt coverage is strongest post-1950, we retain rows where both $Y^{\star}_{t+1}$ and $A_t$ are observed and record a weakly informative prior centered at the empirical base rate.
 
 ```{r}
 #| label: r-make-y-star
@@ -289,7 +247,7 @@ keep <- !is.na(y_star) & !is.na(attempts)
 
 y_star <- as.integer(y_star[keep])
 x_attempt <- as.integer(attempts[keep] > 0)  # 1 = at least one attempt in year t; 0 = no attempt
-N_star    <- length(y_star)
+N_star <- length(y_star)
 
 # Weakly informative prior centered at the sample mean (can be swapped for a training split later)
 p0_star <- mean(y_star)
@@ -300,14 +258,13 @@ beta_star <- m_star * (1 - p0_star)
 # Quick check: base rate and treated/control counts
 mean(y_star); table(x_attempt)
 
-
 ```
 
-*Check.* The printed base rate `mean(y_star)` and the table of `attempt=1/0` confirm the outcome is rare and that both treatment arms are populated.
+The printed base rate `mean(y_star)` and the table of `attempt=1/0` confirm the outcome is rare and that both treatment arms are populated.
 
 ## Sanity check: prior vs. observed vs. posterior
 
-As a diagnostic, I compute conjugate posteriors for the coup-termination rate in the two groups (`attempt=1/0`). This is not the causal estimate; it simply shows the raw association before any adjustment.
+As a pre-model check, we compare the prior mean, observed mean, and conjugate posterior mean of $Y^{\star}_{t+1}$ within each group $A_t \in \{0,1\}$. This is a raw association check; it is **not** our causal estimate.
 
 ```{python}
 #| label: py-y-star-conditional
@@ -345,11 +302,11 @@ print({"diff_mean": float(diff.mean()),
 
 ```
 
-*Result.* The posterior mean in `attempt=1` exceeds that in `attempt=0` with a high `Pr(diff>0)`, reflecting the **unadjusted** association that we will revisit after controlling for country and time.
+The posterior mean in `attempt=1` exceeds that in `attempt=0` with a high `Pr(diff>0)`, reflecting the **unadjusted** association that we will revisit after controlling for country and time.
 
-## Identification: avoid conditioning on next-year termination
+## Identification: avoid conditioning on endings & adjust back-door paths
 
-Conditioning on “the regime ends in (t{+}1)” creates a collider path from time-varying conditions to the outcome. Instead, I model the **marginal** probability (P(Y\^\*\_{t+1}=1 \mid A_t, \text{adjustment})). The DAGs below contrast the biased setup with the identification-friendly one.
+Conditioning on “ends in $t+1$” creates a collider between time-varying drivers and the outcome. We therefore model the marginal probability $P\!\big(Y^{\star}_{t+1}=1 \mid A_t,\ \text{adjustment}\big)$ and block back-door paths by adjusting for country heterogeneity $U_i$, year shocks $W_t$, and a time-varying confounder $C_t$ (civil war).
 
 ```{python}
 #| label: dag_bad
@@ -371,7 +328,7 @@ g.render("dag_bad", cleanup=True)
 
 ![](dag_bad.svg)
 
-*Figure 1.* Conditioning on (E\_{t+1}=1) opens a collider
+**Figure 1.** Conditioning on $E_{t+1}=1$ opens a collider.
 
 ```{python}
 
@@ -394,23 +351,43 @@ g.render("dag_good", cleanup=True)
 
 ![](dag_good.svg)
 
-*Figure 2.* Modelling (Y\^\*\_{t+1}) avoids it and adjusts for country heterogeneity (U_i), year shocks (W_t), and time-varying confounders (C_t) (e.g., civil war).
+**Figure 2.** Modeling $Y^{\star}_{t+1}$ avoids selection on $E$ and adjusts for $U_i$, $W_t$, and $C_t$.
 
-## Estimand and assumptions
+## Estimand and identifying conditions
 
-**Estimand.** The average treatment effect: \[ \text{ATE}=\mathbb{E}\big[Y^\*_{t+1}(1)-Y^\*_{t+1}(0)\big], \] where (Y\^\*\_{t+1}) is “coup termination next year.”
+**Estimand (ATE).**
 
-**Identification.** (i) Temporal ordering (predictors at (t), outcome at (t{+}1)); (ii) Conditional ignorability given country effects, year effects, and civil war; (iii) Overlap (within-country variation in attempts); (iv) SUTVA.
+$$
+\mathrm{ATE} \;=\; \mathbb{E}\!\left[\,Y^{\star}_{t+1}(1)\;-\;Y^{\star}_{t+1}(0)\,\right].
+$$
 
-## Estimation
+**Identification requires:**\
+(i) temporal ordering (predictors at $t$, outcome at $t+1$);\
+(ii) conditional ignorability given $\{U_i,\, W_t,\, C_t\}$;\
+(iii) overlap (within-country variation in $A_t$); and\
+(iv) SUTVA.
 
-I fit (1) a country-and-year fixed-effects logit with country-clustered SEs; (2) a random-intercept logit with year FE to partially pool across countries; and (3) the same random-intercept model **adding civil war** as a time-varying confounder. For each model I report an odds ratio (OR) for `attempt` and the **average risk difference** via g-computation.
+## Estimation strategy and reporting
 
-## Main results
+We estimate the conditional effect of $A_t$ using three specifications:
 
-### Fixed-effects logit with country & year FE g-computed risk difference
+1.  **Fixed-effects logit** with country and year fixed effects and country-clustered standard errors.\
+2.  **Random-intercept logit** with year fixed effects (partial pooling across countries).\
+3.  The same mixed-effects model **adding civil war** as $C_t$.
 
-#### Prepare the panel frame
+For interpretation, we report **odds ratios (OR)** and **average risk differences** via **g-computation**—i.e., predict $P\!\big(Y^{\star}_{t+1}=1\big)$ under $A_t=1$ and under $A_t=0$ for the same rows, then average the difference.
+
+# Causal estimates
+
+We now report within-country contrasts of the effect of a coup attempt in year $t$ on the probability that the regime ends via a coup in year $t+1$. All models align predictors at $t$ and outcomes at $t+1$, avoid conditioning on termination itself, and are read as **conditional** effects under our adjustment set.
+
+------------------------------------------------------------------------
+
+## Model 1: Fixed-effects logit (country & year FE) + g-computed risk difference
+
+Country fixed effects absorb time-invariant heterogeneity ($U_i$) and year fixed effects absorb common shocks ($W_t$). The coefficient on `attempt` is therefore identified from **within-country, over-time** variation.
+
+### Prepare the panel frame
 
 ```{r}
 #| label: r-y-star-frame
@@ -433,7 +410,7 @@ summary(df_star$y_star); table(df_star$attempt)
 
 ```
 
-#### Fixed-effects logit (country & year FE; robust SE)
+### Fixed-effects logit (country & year FE; robust SE)
 
 ```{r}
 #| label: r-fe-logit
@@ -462,7 +439,7 @@ print(list(
 
 ```
 
-#### G-computation: average risk difference
+### G-computation: average risk difference
 
 ```{r}
 #| label: r-ame-riskdiff
@@ -474,12 +451,13 @@ p0 <- predict(fit_fe, newdata = df0, type = "response")
 risk_diff <- mean(p1 - p0)
 print(list(risk_diff = round(risk_diff, 4)))
 
-
 ```
 
-*Result (FE).* The attempt coefficient is negative (OR ≈ 0.70; 95% CI roughly 0.51–0.96) and the model-implied average risk difference is about −2.4 percentage points.
+Coup attempts in year t are associated with a lower chance that the regime ends via a coup in *t+1*: OR = 0.701 (95% CI 0.512–0.959, *p* = 0.026). G-computation implies an average risk difference of −2.43 percentage points (attempt 1 vs. 0). Interpreted within countries over time (absorbing year shocks), attempts do not increase next-year coup-termination risk and may slightly reduce it—reversing the positive raw association. The `glm.fit` warning about probabilities near 0/1 reflects near-separation in a rare outcome; we use clustered SEs and corroborate with the random-intercept model below.
 
-### Random intercepts for countries + year FE
+## Model 2: Random intercepts for countries + year FE
+
+A country random intercept partially pools country baselines rather than estimating a separate dummy for each, which can stabilize estimates when outcomes are rare and FE suffer (quasi-)separation.
 
 ```{r}
 ctrl <- glmerControl(
@@ -518,11 +496,13 @@ print(list(risk_diff_re = round(risk_diff_re, 4)))
 
 ```
 
-*Result (RE + year FE).* Direction and magnitude are very similar (OR ≈ 0.73; risk difference ≈ −2.2 pp), suggesting the FE result is not driven by overfitting country dummies.
+Allowing a random intercept for countries (with year fixed effects) yields OR = 0.728 with 95% CI 0.557–0.950. The g-computed average risk difference is −2.24 percentage points (attempt 1 vs. 0). This mirrors Model 1: within countries and net of period shocks, coup attempts do not raise the next-year probability that a regime ends via a coup. Partial pooling across countries also alleviates the near-separation concern from the high-dimensional FE logit, and the estimate remains negative and statistically different from 1.
 
-### Adding a time-varying confounder: civil war
+## Model 3: Adding a time-varying confounder: civil war
 
-#### Build the confounder and prepare data
+Civil war plausibly affects both the incidence of attempts and the probability of a coup termination, so we include a binary $C_t$ to further block back-door paths.
+
+### Build the confounder and prepare data
 
 ```{r}
 #| label: r-make-c
@@ -553,7 +533,7 @@ table(df_star2$any_conflict, useNA = "ifany")
 
 ```
 
-#### Random intercepts + year FE with civil war
+### Random intercepts + year FE with civil war
 
 ```{r}
 #| label: r-re-logit-conflict
@@ -596,7 +576,7 @@ print(list(
 
 ```
 
-#### Risk difference after adjusting for civil war (g-computation)
+### Risk difference after adjusting for civil war (g-computation)
 
 ```{r}
 #| label: r-riskdiff-conflict
@@ -612,21 +592,114 @@ print(list(risk_diff_adj = round(risk_diff_adj, 4)))
 
 ```
 
-*Result (RE + year FE + civil war).* The attempt effect remains small and slightly negative (OR ≈ 0.71; risk difference ≈ −2.36 pp). The civil-war term is positive (OR \> 1) but imprecise due to rarity.
+Adjusting for civil war hardly changes the attempt effect. The odds ratio for `attempt` is 0.714 with a very wide 95% CI \[0.101, 5.068\]; the g-computed risk difference is −0.0236 (≈ −2.4 percentage points). The coefficient on `any_conflict` points in the expected direction—OR = 1.387—but its 95% CI \[0.195, 9.847\] is extremely imprecise, reflecting the rarity of civil-war years. In short, once we account for country heterogeneity and year shocks, attempts are not associated with a higher probability of coup termination next year; if anything, the estimated effect remains small and negative.
 
 # Main findings
 
-Naïve conjugate splits suggested a strong positive association between coup attempts and coup terminations. Once I align time and adjust for country heterogeneity and year shocks—and further add civil war as a time-varying confounder—the effect shrinks and flips sign: **attempts do not make a coup termination next year more likely**; if anything, the estimated effect is slightly negative (≈ −2–3 pp). This pattern is consistent with composition effects (which countries/years experience attempts) driving the raw association. I interpret the estimates as **conditional average effects** under the stated adjustment set and assumptions.
+A simple split (before any adjustment) suggests that years with a coup attempt are followed by **more** coup terminations. However, once we (i) align time to avoid conditioning on endings and (ii) compare **within countries over time** using country and year effects, that pattern reverses. In the fixed-effects logit, the attempt coefficient implies **OR ≈ 0.70** (95% CI ≈ 0.51–0.96) and a g-computed **risk difference of about −2.4 percentage points**. A random-intercept logit with year fixed effects yields a very similar result (OR ≈ 0.73; risk difference ≈ −2.2 pp). Adding civil war as a time-varying confounder leaves the point estimate essentially unchanged (OR ≈ 0.71; risk difference ≈ −2.4 pp), though uncertainty widens because civil-war years are rare.
 
-# Robustness
-
-Results are stable when partially pooling across countries (random intercepts) and when adding a time-varying confounder (civil war). As a further check against separation in high-dimensional FE, I replicated the FE logit with Firth bias reduction (or estimated the random-intercept model with `glmmTMB`); the OR and risk-difference estimates remained similar. (Appendix reports details.)
+Taken together, the evidence indicates that **coup attempts do not make a coup termination next year more likely**; if anything, the estimated short-run effect is small and negative (≈ −2–3 pp). The contrast with the naive split is consistent with **composition and timing effects**—attempts occur in particular countries and periods—which inflate the raw association. Our estimates should be read as **conditional average effects** under the stated adjustment set (country heterogeneity, year shocks, and civil war).
 
 # Limitations
 
-Civil war and coup attempts are rare; uncertainty is non-trivial. Identification rests on no unmeasured time-varying confounding beyond country/year effects and civil war, and on consistent coding of attempts and terminations in V-Dem.
+Two caveats shape how the results should be read. First, the fixed-effects logit exhibits numerical (quasi-)separation—expected in rare-event panels with many country and year dummies. Although the mixed-effects specification and the g-computed risk differences point in the same direction, finite-sample bias and optimistic standard errors remain possible. Second, both coup attempts and civil war are infrequent. Rarity inflates uncertainty and widens intervals once civil war is included, so effect magnitudes should be interpreted with caution rather than as precise point estimates.
+
+Beyond these statistical issues, several substantive limitations apply. The key variables—`e_pt_coup_attempts` and `v2regendtype`—are assembled from historical sources and may contain misclassification or uneven coverage (attempts are most reliably coded after 1950). By design, we code “still exists” as a non-coup outcome and treat missing civil-war values as zero to align samples; if these choices down-weight near-collapses or mask unrecorded conflict, estimates may be attenuated. Identification also rests on the assumption that adjusting for country heterogeneity, year shocks, and civil war blocks the major back-door paths. Other time-varying forces—mass protest, repression severity, elite splits, or economic crises—could still confound both attempts and coup terminations. Our estimand is short-run (effects of attempts in year *t* on coup termination in *t+1*), so longer lags, anticipation, and feedback dynamics are not modeled, nor are regional spillovers that could violate SUTVA.
+
+These caveats suggest practical robustness checks rather than invalidate the design: penalized/Firth or rare-events logit (or weakly informative Bayesian priors) to mitigate separation; sensitivity to alternative codings of termination and conflict; richer adjustment sets or double-robust estimators to hedge against residual confounding; and dynamic or spatial extensions (event-history models, regional contagion terms) to probe timing and interference. Even with these limitations, the qualitative pattern—that time alignment and adjustment for country and period effects overturn the naïve positive association—remains stable across specifications.
+
+# Robustness
+
+To probe whether our main results are driven by separation in the high-dimensional fixed-effects logit or by optimizer idiosyncrasies in the mixed model, we ran two complementary checks. First, a bias-reduced fixed-effects logit (Firth-type, `brglm2`) produces an odds ratio for `attempt` of 0.711 (95% CI 0.546–0.927), essentially identical to the baseline FE estimate despite separation warnings. Second, re-estimating the random-intercept logit with year fixed effects and civil war using `glmmTMB` yields an odds ratio of 0.712 (95% CI 0.544–0.933) and an average risk difference of −0.0235. Taken together, these exercises indicate that the small, slightly negative association between attempts and next-year coup termination is not an artifact of complete separation or a particular optimizer; it appears stable across estimators and implementations(details see Appendix).
 
 # Reference
+
+Brooks, M. E., Kristensen, K., van Benthem, K. J., Magnusson, A., Berg, C. W., Nielsen, A., Skaug, H. J., Mächler, M., & Bolker, B. M. (2017). glmmTMB balances speed and flexibility among packages for zero-inflated generalized linear mixed modeling. *The R Journal, 9*(2), 378–400. <https://journal.r-project.org/archive/2017/RJ-2017-066/index.html>
+
+Coppedge, M., Gerring, J., Knutsen, C. H., Lindberg, S. I., Teorell, J., Altman, D., Angiolillo, F., Bernhard, M., Cornell, A., Fish, M. S., Fox, L., Gastaldi, L., Gjerløw, H., Glynn, A., Good God, A., Grahn, S., Hicken, A., Kinzelbach, K., Krusell, J., … Ziblatt, D. (2025). *V-Dem [Country–Year/Country–Date] Dataset* (Version 15) [Data set]. Varieties of Democracy (V-Dem) Project. <https://doi.org/10.23696/vdemds25>
+
+Djuve, V. L., Knutsen, C. H., & Wig, T. (2019). Patterns of Regime Breakdown since the French Revolution. *Comparative Political Studies*, 001041401987995. <https://doi.org/10.1177/0010414019879953>
+
+Firth, D. (1993). Bias reduction of maximum likelihood estimates. *Biometrika, 80*(1), 27–38. <https://doi.org/10.1093/biomet/80.1.27>
+
+Geddes, B., Wright, J., & Frantz, E. (2014). Autocratic breakdown and regime transitions: A new data set. *Perspectives on Politics, 12*(2), 313–331. <https://doi.org/10.1017/S1537592714000851>
+
+Goldstone, J. A., Bates, R. H., Epstein, D. L., Gurr, T. R., Lustik, M. B., Marshall, M. G., Ulfelder, J., & Woodward, M. (2010). A global model for forecasting political instability. *American Journal of Political Science, 54*(1), 190–208. <https://doi.org/10.1111/j.1540-5907.2009.00426.x>
+
+Hegre, H., Karlsen, J., Nygård, H. M., Strand, H., & Urdal, H. (2013). Predicting armed conflict, 2010–2050. *International Studies Quarterly, 57*(2), 250–270. <https://doi.org/10.1111/isqu.12007>
+
+King, G., & Zeng, L. (2001). Logistic regression in rare events data. *Political Analysis, 9*(2), 137–163. <https://doi.org/10.1093/oxfordjournals.pan.a004868>
+
+Pearl, J. (2009). *Causality: Models, reasoning, and inference* (2nd ed.). Cambridge University Press. <https://doi.org/10.1017/CBO9780511803161>
+
+Pemstein, D., Marquardt, K. L., Tzelgov, E., Wang, Y.-t., Medzihorsky, J., Krusell, J., Miri, F., & von Römer, J. (2025). *The V-Dem measurement model: Latent variable analysis for cross-national and cross-temporal expert-coded data* (V-Dem Working Paper No. 21, 10th ed.). Varieties of Democracy Institute, University of Gothenburg.
+
+Powell, J. M., & Thyne, C. L. (2011). Global instances of coups from 1950 to present: A new dataset. *Journal of Peace Research, 48*(2), 249–259. <https://doi.org/10.1177/0022343310397436>
+
+Svolik, M. W. (2012). *The politics of authoritarian rule.* Cambridge University Press. <https://doi.org/10.1017/CBO9781139176040>
+
+# Appendix: Robustness checks
+
+## Bias-reduced fixed-effects logit (Firth)
+
+```{r}
+library(brglm2)
+
+fit_fe_firth <- glm(
+  y_star ~ attempt + factor(country_id) + factor(year),
+  data = df_star,
+  family = binomial("logit"),
+  method = "brglmFit",  # <- from brglm2
+  type = "AS_mean" # mean-bias reduction (Firth-like)
+)
+
+co <- summary(fit_fe_firth)$coef["attempt", ]
+b <- unname(co[1]); se <- unname(co[2]); z <- qnorm(0.975)
+ci <- b + c(-1,1)*z*se
+OR <- exp(c(b, ci))
+
+print(list(
+  OR_attempt_firth = round(OR[1], 3),
+  OR95_attempt_firth = round(OR[-1], 3)
+))
+
+```
+
+In our run, the Firth FE logit yields `OR_attempt_firth ≈ 0.711` with a 95% CI of `0.546–0.927`. This is very close to the baseline FE estimate despite separation warnings, indicating that the fixed-effects result is not driven by complete separation or small-sample bias.
+
+## Mixed-effects logit via glmmTMB (optimizer check)
+
+```{r}
+library(glmmTMB)
+
+# Same specification as the RE + year FE + civil war model
+fit_tmb <- glmmTMB(
+  y_star ~ attempt + any_conflict + factor(year) + (1 | country_id),
+  data = df_star2,
+  family = binomial()
+)
+
+co <- summary(fit_tmb)$coefficients$cond["attempt", ]
+b <- unname(co["Estimate"]); se <- unname(co["Std. Error"]); z <- qnorm(0.975)
+ci <- b + c(-1,1)*z*se
+OR <- exp(c(b, ci))
+print(list(
+  OR_attempt_tmb   = round(OR[1], 3),
+  OR95_attempt_tmb = round(OR[-1], 3)
+))
+
+# g-computation: average risk difference under attempt=1 vs 0 for the same rows
+df1 <- transform(df_star2, attempt = 1L)
+df0 <- transform(df_star2, attempt = 0L)
+p1  <- predict(fit_tmb, newdata = df1, type = "response", allow.new.levels = TRUE)
+p0  <- predict(fit_tmb, newdata = df0, type = "response", allow.new.levels = TRUE)
+risk_diff_tmb <- mean(p1 - p0)
+print(list(risk_diff_tmb = round(risk_diff_tmb, 4)))
+
+
+```
+
+With `glmmTMB`, we obtain `OR_attempt_tmb` ≈ 0.712 (95% CI 0.544–0.933) and an average risk difference of `−0.0235`. These values line up with the main mixed-effects model, suggesting the small, slightly negative association is not an optimizer artifact.
 
 ```{=html}
 <script>

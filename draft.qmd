@@ -5,6 +5,101 @@ editor: visual
 ---
 
 
+
+# Introduction
+
+Why do some regimes end in coups while others persist? This project takes a **design-based causal** approach to a narrow, testable question using the [**Varieties of Democracy (V-Dem)**](https://www.v-dem.net/) country–year panel (global coverage; annual updates since the eighteenth century).
+
+**Research question.** *Do coup attempts in year* $t$ *raise the probability that the regime ends via a coup in year* $t{+}1$?
+
+**Unit of analysis.** Country–year.
+
+**One-sentence design.** To avoid temporal leakage, all predictors are measured at year $t$ and the outcome at year $t{+}1$; we model the **marginal** probability of a coup termination next year for **all** country–years, rather than conditioning on the event that a regime ends.
+
+**Key variables.**
+- **Treatment** $A_t$: indicator that at least one coup attempt is recorded in year $t$ (from V-Dem `e_pt_coup_attempts`).
+- **Outcome** $Y^*_{t+1}$: indicator that the regime **ends via a coup** in year $t{+}1$; we code $Y^*_{t+1}=1$ when `v2regendtype_{t+1} ∈ {0,1,2}` (military coup, non-military coup, self-coup) and $0$ for all other non-missing codes, including “still exists” (`13`).  
+  *Rationale:* not conditioning on “the regime ends” avoids a collider between many time-varying forces (e.g., civil war, mass protest, elite splits) and the type of termination.
+
+**Identification in brief.** We block back-door paths by adjusting for:
+1) **Country heterogeneity** $U_i$ (political culture, state capacity, elite organization) via country fixed effects or a country random intercept;
+2) **Period shocks/trends** $W_t$ (e.g., the long-run decline in coups) via year fixed effects; and
+3) A **time-varying confounder** $C_t$ (civil war, from V-Dem `e_civil_war`) that plausibly affects both attempts and coup terminations.  
+Under (i) temporal ordering (predictors at $t$, outcomes at $t{+}1$), (ii) conditional ignorability given $\{U_i,W_t,C_t\}$, (iii) overlap (within-country variation in $A_t$), and (iv) SUTVA, our contrasts identify a **conditional average treatment effect**.
+
+**Estimand.** The average treatment effect of a coup attempt in year $t$ on the probability of a coup termination in year $t{+}1$:
+
+$$
+\mathrm{ATE} \;=\; \mathbb{E}\!\left[\,Y^*_{t+1}(1) - Y^*_{t+1}(0)\,\right].
+$$
+
+**Estimators and reporting.** We fit (a) a logit with country and year fixed effects and clustered standard errors, and (b) a mixed-effects logit with a country random intercept and year fixed effects; we then extend (b) by adding civil war. For interpretability we report **odds ratios (OR)** and **average risk differences** via **g-computation** (predict $P(Y^*_{t+1}=1)$ for the same observations under $A_t{=}1$ and $A_t{=}0$, then average the difference).
+
+**Roadmap.** We first describe how regimes end in V-Dem to set priors, then construct $Y^*_{t+1}$ and $A_t$, show an unadjusted check, and finally present the fixed-effects and mixed-effects estimates with and without the civil-war adjustment.
+
+
+
+
+
+
+-   `histname`: historical label of the political entity; used to track within-country regime continuity.
+-   `v2regendtype`: code describing **how** a regime ends in a year (e.g., military coup `0`, non-military coup `1`, self-coup `2`, “still exists” `13`).
+-   `e_pt_coup_attempts`: count of recorded coup attempts in the year (available for the post-1950 period).
+-   `e_civil_war`: indicator of civil war in the year (time-varying confounder).
+-   `country_id`, `year`: panel identifiers.
+
+We keep observations where these inputs are available and align predictors to year (t) and outcomes to year (t{+}1).
+
+## Measurement and construction
+
+1.  **Within-country change flag.** Standardize `histname` (lowercase, trim whitespace) and mark a change when it differs from the previous year within the same country. This is a descriptive check of regime churn.
+2.  **Next-year end type.** Create `regend_t1 = lead(v2regendtype, 1)` to align end types to (t{+}1).
+3.  **Outcome.** Define (Y\^\*\_{t+1}=1) if `regend_t1 ∈ {0,1,2}` (ends via a coup) and (0) for all other non-missing codes, including `13` “still exists.” This avoids conditioning on the event of ending.
+4.  **Treatment.** Define (A_t=1) if `e_pt_coup_attempts > 0`, else (0). We restrict to years where attempts are recorded (mainly 1950+).
+5.  **Checks.** Report the base rate (\mathbb{E}\[Y\^\*\_{t+1}\]) and the split of (A_t\in{0,1}) to verify rarity and overlap.
+
+## Design diagnostics (descriptive priors)
+
+Before modeling, we tabulate the distribution of `v2regendtype` overall and among rows that precede a `histname` change. These tables are **descriptive priors** only (e.g., coups are rare relative to other endings). We also show an unadjusted split of (Y\^\*\_{t+1}) by (A_t) to illustrate the raw association that the causal design will later adjust.
+
+## Estimation strategy
+
+We target the conditional average treatment effect of (A_t) on (Y\^\*\_{t+1}) under temporal ordering, ignorability given ({U_i,W_t,C_t}), overlap, and SUTVA. Concretely:
+
+-   **Model 1 (FE logit).** Logit with **country fixed effects** and **year fixed effects**; cluster standard errors by country.
+-   **Model 2 (RE logit + year FE).** Mixed-effects logit with a **country random intercept** and **year fixed effects** (partial pooling across countries).
+-   **Model 3 (+ civil war).** Extend Model 2 by adding `e_civil_war` as a time-varying confounder (C_t).
+
+For interpretability we report (i) **odds ratios (OR)** for `attempt`, with 95% CIs; and (ii) **average risk differences** via **g-computation**: predict (P(Y\^\*\_{t+1}=1)) for each row under (A_t{=}1) and (A_t{=}0), then average the difference. If high-dimensional FE causes (quasi-)separation, we note a penalized alternative (e.g., Firth logit or `glmmTMB`) in the Appendix.
+
+## Scope, interpretation, and limitations
+
+Effects are **short-run** ((t \rightarrow t{+}1)) and **conditional** on the adjustment set. They do not capture long-run dynamics or feedback between attempts and conflict. Uncertainty is non-trivial because both coup attempts and coup terminations are rare. Identification assumes no important time-varying confounders beyond country/year effects and civil war, and consistent coding in V-Dem.
+
+## Roadmap
+
+1)  Describe end-type frequencies (descriptive priors).\
+2)  Construct (Y\^\*\_{t+1}) and (A_t); show an unadjusted split.\
+3)  Estimate the FE logit and report OR and g-computed risk difference.\
+4)  Replicate with a random-intercept logit (year FE), then add civil war.\
+5)  Summarize the treatment effect and discuss robustness and limitations.
+
+
+
+
+
+
+This project uses causal inference to move from descriptive co-movement to credible claims about causes of macro-political change. We study **regime change** through a design that aligns temporal information and guards against post-treatment conditioning. The empirical setting is the **Varieties of Democracy (V-Dem)** project, one of the most comprehensive, annually updated cross-national data sets on regimes and institutions (covering most countries since the 18th century).<br>
+
+Data: <https://github.com/vdeminstitute/vdemdata>
+
+**Research question:** *Which conditions make it more (or less) likely that a country experiences a regime change—and, in particular, a regime change that ends via a coup?*
+
+**Unit of analysis:** Country–year.
+
+**Design choice:** To prevent temporal leakage, predictors come from year (t); outcomes refer to year (t+1). We treat “coup termination next year” as the outcome and study whether **coup attempts in year (t)** raise that risk after adjusting for country heterogeneity and time-varying confounders (e.g., civil war). This lets us compare like with like—changes **within countries over time**, not just differences across countries.
+
+
 The analysis is guided by four core research questions:
 
 RQ: What kinds of factors cause a country to undergo a regime change?
@@ -28,6 +123,7 @@ library(effects)
 library(stringr)
 ```
 
+V-Dem includes a variable, v2reginfo, that labels distinct historical phases within the same political entity (e.g., “Soviet Russia,” “USSR under Stalin,” “Post-Stalin USSR”) as separate regimes. While this fine-grained coding is valuable for phase-typed institutional histories, in this study I adopt a broader conception of “regime” tied to the persistence of the overarching political entity. Concretely, I operationalize regime change as a within-country shift in histname across adjacent years. This choice treats leader-centered or intra-regime episodes (that v2reginfo may separate) as continuity rather than change, while recognizing foundational transformations that coincide with historical-state redefinitions (e.g., mergers, dissolutions, refoundings). I report sensitivity analyses that compare this histname-based indicator to a v2reginfo-based alternative to gauge how inferences depend on the operationalization.
 
 ## Create Regime Change Variable
 
@@ -641,3 +737,272 @@ print("VER:", platform.python_version())
 
 ```
 
+
+
+
+
+结果（控制国家/年份与内战）：在加入国家随机截距与年份固定效应并控制当年是否内战后，attempt=1 对“次年是否以政变方式结束”的影响为 OR=0.714（95% CI：0.101–5.068），对应的平均风险差约 −2.36 个百分点。这与不控制时的强正相关（+24.5pp）方向相反，说明先前的关联主要来自国家/年份之间的系统性差异；在同一国家内部、同一时间背景下比较，当年出现政变企图并不显著提高次年政变收场的概率，估计甚至略偏负。 内战系数方向为正（OR≈1.39），符合直觉，但由于内战年份较少（约 5%），不确定性较大。
+
+
+
+
+# Appendix
+
+条件版解析（两组的 prior/obs/post）
+
+```{python}
+#| label: py-conditional-analytic
+import numpy as np
+
+y = np.array(r.y, dtype="int64")
+x = np.array(r.x, dtype="int64")
+alpha = float(r.alpha); beta = float(r.beta)
+
+def stats(mask, name):
+    y_g = y[mask]; n = len(y_g); s = int(y_g.sum())
+    prior_mean = alpha/(alpha+beta)
+    post_mean  = (alpha + s)/(alpha + beta + n)   # Beta–Bernoulli 共轭后验均值
+    obs_mean   = y_g.mean() if n>0 else np.nan
+    return {"group": name, "n": n,
+            "prior_mean": round(float(prior_mean),4),
+            "obs_mean":   round(float(obs_mean),4),
+            "post_mean":  round(float(post_mean),4)}
+
+out = [stats(x==1, "attempt=1"), stats(x==0, "attempt=0")]
+print(out)
+print({"posterior_diff": round(out[0]["post_mean"] - out[1]["post_mean"], 4)})
+
+
+```
+
+我们用 Beta 共轭的后验抽样，给两组各自的 95% 区间，并给出“差值\>0 的后验概率”。把下面这段 放在你刚打印两组均值的 Python 块后面 即可：
+
+```{python}
+#| label: py-conditional-intervals
+import numpy as np
+rng = np.random.default_rng(0)
+
+y = np.array(r.y, dtype="int64")
+x = np.array(r.x, dtype="int64")
+alpha = float(r.alpha); beta = float(r.beta)
+
+def post_draws(mask, size=50000):
+    y_g = y[mask]
+    n = len(y_g); s = int(y_g.sum())
+    a = alpha + s
+    b = beta  + (n - s)
+    return rng.beta(a, b, size=size)
+
+d1 = post_draws(x==1)   # attempt=1
+d0 = post_draws(x==0)   # attempt=0
+diff = d1 - d0
+
+def summarize(d):
+    return {
+        "mean": float(d.mean()),
+        "ci90": tuple(np.round(np.quantile(d, [0.05, 0.95]), 4)),
+        "ci95": tuple(np.round(np.quantile(d, [0.025, 0.975]), 4)),
+    }
+
+print({
+    "attempt=1": summarize(d1),
+    "attempt=0": summarize(d0),
+    "diff_mean": float(diff.mean()),
+    "Pr(diff>0)": float((diff > 0).mean()),
+    "diff_ci95": tuple(np.round(np.quantile(diff, [0.025, 0.975]), 4)),
+})
+
+```
+
+## 步骤 A（R → 准备 y 和先验 α, β）
+
+放在 Python 块之前；它只做三件事：从 vdem_change 构造 y（t+1 是否以 coup 收场）、计算经验比例 p0、给出先验强度 m 和 alpha, beta。
+
+```{r}
+
+#| label: r-make-y-and-prior
+# 用 regend_t1 构造二元 y：{0,1,2}=1；其它且≠13=0；13(仍存在)丢弃
+y <- with(vdem_change, ifelse(regend_t1 %in% c(0,1,2), 1L,
+                       ifelse(!is.na(regend_t1) & regend_t1 != 13, 0L, NA_integer_)))
+y <- y[!is.na(y)]            # 丢弃 NA
+y <- as.integer(y)
+
+# 经验比例（先验中心）
+p0 <- mean(y)                # 例如 0.08 左右（你的数据会自动算）
+m  <- 20                     # 等效样本量（先小点；后续可调 50/100）
+alpha <- m * p0
+beta  <- m * (1 - p0)
+N <- length(y)
+
+# 小检查
+length(y); mean(y); alpha; beta
+
+```
+
+在 R 里和 y 对齐一个自变量 x_attempt（0/1）：
+
+```{r}
+# 放在 r-make-y-and-prior 之后
+#| label: r-make-x-attempt
+library(dplyr)
+
+df_yx <- vdem_change %>%
+  mutate(
+    y = case_when(
+      regend_t1 %in% c(0,1,2) ~ 1L,
+      !is.na(regend_t1) & regend_t1 != 13 ~ 0L,
+      TRUE ~ NA_integer_
+    ),
+    x_attempt = case_when(
+      !is.na(e_pt_coup_attempts) & e_pt_coup_attempts > 0 ~ 1L,
+      !is.na(e_pt_coup_attempts) & e_pt_coup_attempts == 0 ~ 0L,
+      TRUE ~ NA_integer_  # ← NA 保留
+    )
+  ) %>%
+  filter(!is.na(y)) %>%
+  tidyr::drop_na(x_attempt) %>%
+  select(y, x_attempt)
+
+# 传给 Python
+y <- as.integer(df_yx$y)
+x <- as.integer(df_yx$x_attempt)
+N <- length(y)
+
+# 看一下两组样本量（有/无企图）
+table(x)
+
+```
+
+把这段放在上面 R 块**后面**即可（它只用到 `r.y_star / r.x_attempt / r.alpha_star / r.beta_star`）。
+
+```{python}
+#| label: py-y-star-conditional
+import numpy as np
+rng = np.random.default_rng(0)
+
+y_star    = np.array(r.y_star, dtype="int64")
+x_attempt = np.array(r.x_attempt, dtype="int64")
+alpha     = float(r.alpha_star)
+beta      = float(r.beta_star)
+
+def group_stats(mask, name):
+    y = y_star[mask]
+    n = len(y); s = int(y.sum())
+    prior_mean = alpha/(alpha+beta)
+    post_mean  = (alpha + s)/(alpha + beta + n)
+    obs_mean   = y.mean()
+    return {"group": name, "n": n,
+            "prior_mean": round(float(prior_mean),4),
+            "obs_mean":   round(float(obs_mean),4),
+            "post_mean":  round(float(post_mean),4)}
+
+out = [group_stats(x_attempt==1, "attempt=1"),
+       group_stats(x_attempt==0, "attempt=0")]
+print(out)
+
+# 不确定性：后验抽样求区间与差值概率
+def post_draws(mask, size=40000):
+    y = y_star[mask]
+    n = len(y); s = int(y.sum())
+    a = alpha + s; b = beta + (n - s)
+    return rng.beta(a, b, size=size)
+
+d1 = post_draws(x_attempt==1)
+d0 = post_draws(x_attempt==0)
+diff = d1 - d0
+
+print({
+    "diff_mean": float(diff.mean()),
+    "Pr(diff>0)": float((diff>0).mean()),
+    "diff_ci95": tuple(np.round(np.quantile(diff, [0.025, 0.975]), 4))
+})
+
+
+
+```
+
+## 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）
+
+```{python}
+#| label: py-pgm-beta-bern
+import numpy as np, pymc as pm
+
+# 从 R 取数
+y = np.array(r.y, dtype="int64")
+alpha = float(r.alpha)
+beta = float(r.beta)
+N = int(r.N)
+
+# 给模型声明 plate
+coords = {"obs_id": np.arange(N)}
+with pm.Model(coords=coords) as beta_bern:
+    # 顶部：Beta先验
+    p_coup = pm.Beta("p_coup", alpha=alpha, beta=beta)
+    # 底部：观测数据（带 plate）
+    y_obs = pm.Bernoulli("saycoup_obs", p=p_coup, observed=y, dims="obs_id")
+
+# 生成 pgm_base.svg 并清理中间文件
+pm.model_to_graphviz(beta_bern).render(filename="pgm_base", format="svg", cleanup=True)
+
+```
+
+![](pgm_base.svg)
+
+现在的 baseline **只有一个全局概率** pcoupp\_{\text{coup}}pcoup​，它回答的是：
+
+> “在所有 *会在 t+1 年结束* 的政体中，‘以政变方式结束’的大致占比是多少？”
+
+它**没有**利用任何 t 年的信息（比如是否出现政变企图、内战、抗议等）。因此它**不区分情境**，把所有国家–年都“混在一起”估一个平均值。这对做基线/检查管用，但回答不了这类问题：
+
+-   “当年**有政变企图**时，下一年以政变收场的概率是否更高？”
+
+-   “**内战**的年份 vs 非内战年份，这个概率有什么差异？”
+
+所以要加“条件变量”（covariate），是为了**把总体概率拆成情境化的概率**，也就是从
+
+## 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字
+
+先不画图、不做复杂评估，只看先验均值 vs 后验均值 vs 观测均值，确认“信息更新”的方向对不对。
+
+```{r}
+#| label: opts
+#| echo: false
+RUN_MCMC <- FALSE 
+DRAWS    <- 800
+TUNE     <- 400
+```
+
+```{python}
+#| label: stepC-posterior-check
+import numpy as np, pymc as pm
+
+# ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——
+RUN_MCMC = bool(getattr(r, "RUN_MCMC", False))
+DRAWS    = int(getattr(r, "DRAWS", 800))
+TUNE     = int(getattr(r, "TUNE", 400))
+
+y = np.array(r.y, dtype="int64")
+alpha = float(r.alpha); beta = float(r.beta)
+
+prior_mean = alpha/(alpha+beta)
+obs_mean   = y.mean()
+
+if RUN_MCMC:
+    with beta_bern:
+        idata = pm.sample(draws=DRAWS, tune=TUNE,
+                          chains=2, cores=1, target_accept=0.9,
+                          random_seed=42, compute_convergence_checks=False)
+    post_mean = float(idata.posterior["p_coup"].values.mean())
+    mode = "mcmc"
+else:
+    N = len(y); s = int(y.sum())
+    post_mean = (alpha + s) / (alpha + beta + N)   # Beta–Bernoulli 共轭的解析后验均值
+    mode = "analytic"
+
+print({"mode": mode,
+       "prior_mean": round(float(prior_mean),4),
+       "obs_mean":   round(float(obs_mean),4),
+       "post_mean":  round(float(post_mean),4)})
+
+
+```

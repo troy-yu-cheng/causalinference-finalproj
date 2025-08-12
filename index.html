@@ -3285,42 +3285,53 @@ window.Quarto = {
     <h2 id="toc-title">Contents</h2>
    
   <ul>
-  <li><a href="#note" id="toc-note" class="nav-link active" data-scroll-target="#note"><span class="header-section-number">1</span> Note</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> Introduction</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a>
   <ul class="collapse">
-  <li><a href="#identification-and-estimand" id="toc-identification-and-estimand" class="nav-link" data-scroll-target="#identification-and-estimand"><span class="header-section-number">2.1</span> Identification and Estimand</a></li>
-  <li><a href="#data-and-variables" id="toc-data-and-variables" class="nav-link" data-scroll-target="#data-and-variables"><span class="header-section-number">2.2</span> Data and variables</a></li>
-  <li><a href="#measurement-and-construction" id="toc-measurement-and-construction" class="nav-link" data-scroll-target="#measurement-and-construction"><span class="header-section-number">2.3</span> Measurement and construction</a></li>
-  <li><a href="#design-diagnostics-descriptive-priors" id="toc-design-diagnostics-descriptive-priors" class="nav-link" data-scroll-target="#design-diagnostics-descriptive-priors"><span class="header-section-number">2.4</span> Design diagnostics (descriptive priors)</a></li>
-  <li><a href="#estimation-strategy" id="toc-estimation-strategy" class="nav-link" data-scroll-target="#estimation-strategy"><span class="header-section-number">2.5</span> Estimation strategy</a></li>
-  <li><a href="#scope-interpretation-and-limitations" id="toc-scope-interpretation-and-limitations" class="nav-link" data-scroll-target="#scope-interpretation-and-limitations"><span class="header-section-number">2.6</span> Scope, interpretation, and limitations</a></li>
-  <li><a href="#roadmap" id="toc-roadmap" class="nav-link" data-scroll-target="#roadmap"><span class="header-section-number">2.7</span> Roadmap</a></li>
+  <li><a href="#data-and-variables" id="toc-data-and-variables" class="nav-link" data-scroll-target="#data-and-variables"><span class="header-section-number">1.1</span> Data and variables</a></li>
+  <li><a href="#identification-and-estimand" id="toc-identification-and-estimand" class="nav-link" data-scroll-target="#identification-and-estimand"><span class="header-section-number">1.2</span> Identification and Estimand</a></li>
+  <li><a href="#estimation-methodology" id="toc-estimation-methodology" class="nav-link" data-scroll-target="#estimation-methodology"><span class="header-section-number">1.3</span> Estimation methodology</a></li>
   </ul></li>
-  <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages"><span class="header-section-number">3</span> Load Packages</a></li>
-  <li><a href="#import-vdem-data-using-its-r-package" id="toc-import-vdem-data-using-its-r-package" class="nav-link" data-scroll-target="#import-vdem-data-using-its-r-package"><span class="header-section-number">4</span> Import Vdem Data using its R Package</a></li>
-  <li><a href="#operationalizing-regime-change" id="toc-operationalizing-regime-change" class="nav-link" data-scroll-target="#operationalizing-regime-change"><span class="header-section-number">5</span> Operationalizing Regime Change</a>
+  <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages"><span class="header-section-number">2</span> Load Packages</a></li>
+  <li><a href="#import-vdem-data-using-its-r-package" id="toc-import-vdem-data-using-its-r-package" class="nav-link" data-scroll-target="#import-vdem-data-using-its-r-package"><span class="header-section-number">3</span> Import Vdem Data using its R Package</a></li>
+  <li><a href="#measurement-strategy-and-temporal-alignment" id="toc-measurement-strategy-and-temporal-alignment" class="nav-link" data-scroll-target="#measurement-strategy-and-temporal-alignment"><span class="header-section-number">4</span> Measurement strategy and temporal alignment</a>
   <ul class="collapse">
-  <li><a href="#descriptive-priors-from-v2regendtype" id="toc-descriptive-priors-from-v2regendtype" class="nav-link" data-scroll-target="#descriptive-priors-from-v2regendtype"><span class="header-section-number">5.1</span> Descriptive priors from <code>v2regendtype</code></a></li>
-  <li><a href="#distribution-of-regime-end-types-v2regendtype" id="toc-distribution-of-regime-end-types-v2regendtype" class="nav-link" data-scroll-target="#distribution-of-regime-end-types-v2regendtype"><span class="header-section-number">5.2</span> Distribution of regime end types (<code>v2regendtype</code>)</a></li>
+  <li><a href="#construct-within-country-change-and-a-tt1-target" id="toc-construct-within-country-change-and-a-tt1-target" class="nav-link" data-scroll-target="#construct-within-country-change-and-a-tt1-target"><span class="header-section-number">4.1</span> Construct within-country change and a t→t+1 target</a></li>
+  <li><a href="#descriptive-priors-from-v2regendtype" id="toc-descriptive-priors-from-v2regendtype" class="nav-link" data-scroll-target="#descriptive-priors-from-v2regendtype"><span class="header-section-number">4.2</span> Descriptive priors from <em>v2regendtype</em></a></li>
+  <li><a href="#summarize-end-type-distributions" id="toc-summarize-end-type-distributions" class="nav-link" data-scroll-target="#summarize-end-type-distributions"><span class="header-section-number">4.3</span> Summarize end-type distributions</a></li>
   </ul></li>
-  <li><a href="#causal-pipeline" id="toc-causal-pipeline" class="nav-link" data-scroll-target="#causal-pipeline"><span class="header-section-number">6</span> Causal pipeline</a>
+  <li><a href="#from-measurement-to-identification" id="toc-from-measurement-to-identification" class="nav-link" data-scroll-target="#from-measurement-to-identification"><span class="header-section-number">5</span> From measurement to identification</a>
   <ul class="collapse">
-  <li><a href="#constructing-the-outcome-and-the-treatment" id="toc-constructing-the-outcome-and-the-treatment" class="nav-link" data-scroll-target="#constructing-the-outcome-and-the-treatment"><span class="header-section-number">6.1</span> Constructing the outcome and the treatment</a></li>
-  <li><a href="#sanity-check-prior-vs.-observed-vs.-posterior" id="toc-sanity-check-prior-vs.-observed-vs.-posterior" class="nav-link" data-scroll-target="#sanity-check-prior-vs.-observed-vs.-posterior"><span class="header-section-number">6.2</span> Sanity check: prior vs. observed vs. posterior</a></li>
-  <li><a href="#identification-avoid-conditioning-on-next-year-termination" id="toc-identification-avoid-conditioning-on-next-year-termination" class="nav-link" data-scroll-target="#identification-avoid-conditioning-on-next-year-termination"><span class="header-section-number">6.3</span> Identification: avoid conditioning on next-year termination</a></li>
-  <li><a href="#estimand-and-assumptions" id="toc-estimand-and-assumptions" class="nav-link" data-scroll-target="#estimand-and-assumptions"><span class="header-section-number">6.4</span> Estimand and assumptions</a></li>
-  <li><a href="#estimation" id="toc-estimation" class="nav-link" data-scroll-target="#estimation"><span class="header-section-number">6.5</span> Estimation</a></li>
-  <li><a href="#main-results" id="toc-main-results" class="nav-link" data-scroll-target="#main-results"><span class="header-section-number">6.6</span> Main results</a>
+  <li><a href="#outcome-and-treatment" id="toc-outcome-and-treatment" class="nav-link" data-scroll-target="#outcome-and-treatment"><span class="header-section-number">5.1</span> Outcome and treatment</a></li>
+  <li><a href="#sanity-check-prior-vs.-observed-vs.-posterior" id="toc-sanity-check-prior-vs.-observed-vs.-posterior" class="nav-link" data-scroll-target="#sanity-check-prior-vs.-observed-vs.-posterior"><span class="header-section-number">5.2</span> Sanity check: prior vs. observed vs. posterior</a></li>
+  <li><a href="#identification-avoid-conditioning-on-endings-adjust-back-door-paths" id="toc-identification-avoid-conditioning-on-endings-adjust-back-door-paths" class="nav-link" data-scroll-target="#identification-avoid-conditioning-on-endings-adjust-back-door-paths"><span class="header-section-number">5.3</span> Identification: avoid conditioning on endings &amp; adjust back-door paths</a></li>
+  <li><a href="#estimand-and-identifying-conditions" id="toc-estimand-and-identifying-conditions" class="nav-link" data-scroll-target="#estimand-and-identifying-conditions"><span class="header-section-number">5.4</span> Estimand and identifying conditions</a></li>
+  <li><a href="#estimation-strategy-and-reporting" id="toc-estimation-strategy-and-reporting" class="nav-link" data-scroll-target="#estimation-strategy-and-reporting"><span class="header-section-number">5.5</span> Estimation strategy and reporting</a></li>
+  </ul></li>
+  <li><a href="#causal-estimates" id="toc-causal-estimates" class="nav-link" data-scroll-target="#causal-estimates"><span class="header-section-number">6</span> Causal estimates</a>
   <ul class="collapse">
-  <li><a href="#fixed-effects-logit-with-country-year-fe-g-computed-risk-difference" id="toc-fixed-effects-logit-with-country-year-fe-g-computed-risk-difference" class="nav-link" data-scroll-target="#fixed-effects-logit-with-country-year-fe-g-computed-risk-difference"><span class="header-section-number">6.6.1</span> Fixed-effects logit with country &amp; year FE g-computed risk difference</a></li>
-  <li><a href="#random-intercepts-for-countries-year-fe" id="toc-random-intercepts-for-countries-year-fe" class="nav-link" data-scroll-target="#random-intercepts-for-countries-year-fe"><span class="header-section-number">6.6.2</span> Random intercepts for countries + year FE</a></li>
-  <li><a href="#adding-a-time-varying-confounder-civil-war" id="toc-adding-a-time-varying-confounder-civil-war" class="nav-link" data-scroll-target="#adding-a-time-varying-confounder-civil-war"><span class="header-section-number">6.6.3</span> Adding a time-varying confounder: civil war</a></li>
+  <li><a href="#model-1-fixed-effects-logit-country-year-fe-g-computed-risk-difference" id="toc-model-1-fixed-effects-logit-country-year-fe-g-computed-risk-difference" class="nav-link" data-scroll-target="#model-1-fixed-effects-logit-country-year-fe-g-computed-risk-difference"><span class="header-section-number">6.1</span> Model 1: Fixed-effects logit (country &amp; year FE) + g-computed risk difference</a>
+  <ul class="collapse">
+  <li><a href="#prepare-the-panel-frame" id="toc-prepare-the-panel-frame" class="nav-link" data-scroll-target="#prepare-the-panel-frame"><span class="header-section-number">6.1.1</span> Prepare the panel frame</a></li>
+  <li><a href="#fixed-effects-logit-country-year-fe-robust-se" id="toc-fixed-effects-logit-country-year-fe-robust-se" class="nav-link" data-scroll-target="#fixed-effects-logit-country-year-fe-robust-se"><span class="header-section-number">6.1.2</span> Fixed-effects logit (country &amp; year FE; robust SE)</a></li>
+  <li><a href="#g-computation-average-risk-difference" id="toc-g-computation-average-risk-difference" class="nav-link" data-scroll-target="#g-computation-average-risk-difference"><span class="header-section-number">6.1.3</span> G-computation: average risk difference</a></li>
+  </ul></li>
+  <li><a href="#model-2-random-intercepts-for-countries-year-fe" id="toc-model-2-random-intercepts-for-countries-year-fe" class="nav-link" data-scroll-target="#model-2-random-intercepts-for-countries-year-fe"><span class="header-section-number">6.2</span> Model 2: Random intercepts for countries + year FE</a></li>
+  <li><a href="#model-3-adding-a-time-varying-confounder-civil-war" id="toc-model-3-adding-a-time-varying-confounder-civil-war" class="nav-link" data-scroll-target="#model-3-adding-a-time-varying-confounder-civil-war"><span class="header-section-number">6.3</span> Model 3: Adding a time-varying confounder: civil war</a>
+  <ul class="collapse">
+  <li><a href="#build-the-confounder-and-prepare-data" id="toc-build-the-confounder-and-prepare-data" class="nav-link" data-scroll-target="#build-the-confounder-and-prepare-data"><span class="header-section-number">6.3.1</span> Build the confounder and prepare data</a></li>
+  <li><a href="#random-intercepts-year-fe-with-civil-war" id="toc-random-intercepts-year-fe-with-civil-war" class="nav-link" data-scroll-target="#random-intercepts-year-fe-with-civil-war"><span class="header-section-number">6.3.2</span> Random intercepts + year FE with civil war</a></li>
+  <li><a href="#risk-difference-after-adjusting-for-civil-war-g-computation" id="toc-risk-difference-after-adjusting-for-civil-war-g-computation" class="nav-link" data-scroll-target="#risk-difference-after-adjusting-for-civil-war-g-computation"><span class="header-section-number">6.3.3</span> Risk difference after adjusting for civil war (g-computation)</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#main-findings" id="toc-main-findings" class="nav-link" data-scroll-target="#main-findings"><span class="header-section-number">7</span> Main findings</a></li>
-  <li><a href="#robustness" id="toc-robustness" class="nav-link" data-scroll-target="#robustness"><span class="header-section-number">8</span> Robustness</a></li>
-  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">9</span> Limitations</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">8</span> Limitations</a></li>
+  <li><a href="#robustness" id="toc-robustness" class="nav-link" data-scroll-target="#robustness"><span class="header-section-number">9</span> Robustness</a></li>
   <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference"><span class="header-section-number">10</span> Reference</a></li>
+  <li><a href="#appendix-robustness-checks" id="toc-appendix-robustness-checks" class="nav-link" data-scroll-target="#appendix-robustness-checks"><span class="header-section-number">11</span> Appendix: Robustness checks</a>
+  <ul class="collapse">
+  <li><a href="#bias-reduced-fixed-effects-logit-firth" id="toc-bias-reduced-fixed-effects-logit-firth" class="nav-link" data-scroll-target="#bias-reduced-fixed-effects-logit-firth"><span class="header-section-number">11.1</span> Bias-reduced fixed-effects logit (Firth)</a></li>
+  <li><a href="#mixed-effects-logit-via-glmmtmb-optimizer-check" id="toc-mixed-effects-logit-via-glmmtmb-optimizer-check" class="nav-link" data-scroll-target="#mixed-effects-logit-via-glmmtmb-optimizer-check"><span class="header-section-number">11.2</span> Mixed-effects logit via glmmTMB (optimizer check)</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -3330,15 +3341,19 @@ window.Quarto = {
 
 
 
-<section id="note" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Note</h1>
-<p>Hi Prof. Jeff, I have some issues regarding to rendering LaTex. I’ll fix it in next three hours. Thx for your patience!</p>
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Understanding why regimes endure or break down is a core question in comparative politics. This project takes a <strong>design-based causal approach</strong> to ask whether conditions observed in year <em>t</em> make a <strong>coup termination</strong> of the regime more likely in year <em>t+1</em>. We leverage the <a href="https://doi.org/10.23696/vdemds25"><strong>Varieties of Democracy (V-Dem)</strong></a> country–year panel, which provides globally comparable annual indicators since the eighteenth century, and we align predictors to year <em>t</em> and outcomes to year <em>t+1</em> to avoid temporal leakage. Our focus is intentionally narrow: do <strong>coup attempts in year</strong> <em>t</em> raise the short-run risk that a regime ends <strong>via a coup</strong> next year, once we account for country heterogeneity and time-varying turmoil?</p>
+<p>Our project builds on three strands. First, work on coups documents their incidence, correlates, and consequences, showing that attempts arise from elite coordination problems and are shaped by military cohesion, repression, and institutional constraints (<a href="https://doi.org/10.1177/0022343310397436">Powell &amp; Thyne, 2011</a>; <a href="https://doi.org/10.1017/S1537592714000851">Geddes, Wright, &amp; Frantz, 2014</a>). Second, theories of authoritarian politics emphasize power-sharing and ruler–elite bargaining, which structure both the incentives to attempt coups and the conditions under which they succeed (<a href="https://doi.org/10.1017/CBO9781139176040">Svolik, 2012</a>). Third, research on political instability and civil conflict demonstrates that mass contention and organized violence alter regime vulnerability and the payoff to elite defection, while global trends in the post–Cold War era contributed to a secular decline in coups (<a href="https://doi.org/10.1111/j.1540-5907.2009.00426.x">Goldstone et al., 2010</a>; <a href="https://doi.org/10.1111/isqu.12007">Hegre et al., 2013</a>).</p>
+<p>Methodologically, we follow the identification playbook that warns against post-treatment conditioning and collider bias and recommends design-based adjustments and transparent estimands (<a href="https://doi.org/10.1017/CBO9780511803161">Pearl, 2009</a>). We also heed guidance for rare-events logistic regression when interpreting odds ratios in sparse outcomes (<a href="https://doi.org/10.1093/oxfordjournals.pan.a004868">King &amp; Zeng, 2001</a>). For implementation, we rely on the V-Dem country–year panel (<a href="https://www.v-dem.net/data/the-v-dem-dataset/">Coppedge et al., various years</a>) and estimate mixed-effects models using the <code>glmmTMB</code> framework (<a href="https://journal.r-project.org/archive/2017/RJ-2017-066/index.html">Brooks et al., 2017</a>). To guard against separation in high-dimensional fixed-effects logit, we cross-check with bias-reduced estimation in the spirit of <a href="https://doi.org/10.1093/biomet/80.1.27">Firth (1993)</a>.</p>
+<section id="data-and-variables" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="data-and-variables"><span class="header-section-number">1.1</span> Data and variables</h2>
+<p>We use the Varieties of Democracy (V-Dem) country–year panel. The unit of analysis is the country–year. Three variables anchor measurement. First, <code>v2regendtype</code> encodes how a regime ends in a given year; we treat values 0, 1, and 2 as coup terminations (military coup, non-military coup, self-coup) and treat all other non-missing values—including “regime still exists” (13)—as non-coup. This choice lets us define an outcome for all country–years in year <span class="math inline">\(t+1\)</span> and, crucially, avoids conditioning on whether a regime ends. Second, <a href="https://doi.org/10.1177/0010414019879953"><code>e_pt_coup_attempts</code></a> records the count of coup attempts in year <span class="math inline">\(t\)</span>; we define the treatment as an indicator that at least one attempt occurred (<span class="math inline">\(A_t=1\)</span> if &gt;0, otherwise <span class="math inline">\(0\)</span>). Coverage for attempts is strongest after 1950, so the effective sample reflects that period. Third, we include <code>e_civil_war</code> as a salient time-varying confounder that plausibly increases both the probability of attempts and the probability that a termination, if it occurs, takes the form of a coup. For descriptive context we also standardize and compare <code>histname</code> across adjacent years within a country to summarize institutional churn, but we do not condition on <code>histname</code> changes in the causal models.</p>
+<p>The design aligns predictors to year <span class="math inline">\(t\)</span> and defines the outcome for year <span class="math inline">\(t+1\)</span> for every country–year: <span class="math inline">\(Y^*_{t+1}=1\)</span> if <code>v2regendtype_{t+1} ∈ {0,1,2}</code> and <span class="math inline">\(0\)</span> otherwise. This specification addresses a common source of bias: if one first restricts attention to country–years where the regime ends in <span class="math inline">\(t+1\)</span> and then models “coup vs. non-coup” among those cases, the conditioning event acts as a collider for many time-varying forces (e.g., civil war, protest, elite fractures), inducing spurious associations with the coup outcome. By modeling the marginal probability of coup termination next year for the full panel, we avoid this collider while keeping the estimand directly interpretable.</p>
+<p>Identification relies on absorbing stable cross-country differences with country effects (either fixed effects or a random intercept), absorbing global and period-specific shocks with year fixed effects, and adjusting for a time-varying confounder (civil war). Under temporal ordering (predictors at <span class="math inline">\(t\)</span>, outcome at <span class="math inline">\(t+1\)</span>), conditional ignorability given <span class="math inline">\({U_i, W_t, C_t}\)</span>, overlap (within-country variation in attempts), and SUTVA, the contrasts we report can be interpreted as conditional average treatment effects of an attempt on the next-year probability of coup termination.</p>
 </section>
-<section id="introduction" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Introduction</h1>
-<p>Understanding why regimes endure or break down is a core question in comparative politics. This project takes a <strong>design-based causal approach</strong> to ask whether conditions observed in year <em>t</em> make a <strong>coup termination</strong> of the regime more likely in year <em>t+1</em>. We leverage the <a href="https://www.v-dem.net/"><strong>Varieties of Democracy (V-Dem)</strong></a> country–year panel, which provides globally comparable annual indicators since the eighteenth century, and we align predictors to year <em>t</em> and outcomes to year <em>t+1</em> to avoid temporal leakage. Our focus is intentionally narrow: do <strong>coup attempts in year</strong> <em>t</em> raise the short-run risk that a regime ends <strong>via a coup</strong> next year, once we account for country heterogeneity and time-varying turmoil?</p>
-<section id="identification-and-estimand" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="identification-and-estimand"><span class="header-section-number">2.1</span> Identification and Estimand</h2>
+<section id="identification-and-estimand" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="identification-and-estimand"><span class="header-section-number">1.2</span> Identification and Estimand</h2>
 <p>Our identification strategy relies on <strong>temporal alignment</strong> and <strong>avoiding post-treatment conditioning</strong>. A common but problematic approach is to condition on the event that a regime ends in year <span class="math inline">\(t+1\)</span> and then model the type of termination among those endings; doing so opens a <strong>collider path</strong> because time-varying forces (e.g., civil war, mass protest, elite splits) influence both whether a regime ends and how it ends. To prevent this bias, we do <strong>not</strong> condition on termination. Instead, we define the outcome for all country–years as <span class="math inline">\(Y^*_{t+1}=\mathbf{1}\{\text{coup termination in }t+1\}\)</span> and model the <strong>marginal probability</strong> <span class="math inline">\(P\!\big(Y^*_{t+1}=1 \mid A_t,\ \text{adjustment}\big)\)</span>, where <span class="math inline">\(A_t=\mathbf{1}\{\text{at least one coup attempt in }t\}\)</span>.</p>
 <p>We adjust for three ingredients that capture back-door paths emphasized in the literature on regime durability and coups. First, <strong>country heterogeneity</strong> <span class="math inline">\(U_i\)</span> (political culture, state capacity, elite organizations) is absorbed via country fixed effects or a country random intercept. Second, <strong>global and period-specific shocks</strong> <span class="math inline">\(W_t\)</span> (e.g., the long-run decline in coups) are absorbed via year fixed effects. Third, a <strong>time-varying confounder</strong> <span class="math inline">\(C_t\)</span> (civil war) is included because it plausibly affects both the incidence of attempts and the likelihood of a coup termination. Under (i) temporal ordering (predictors at <span class="math inline">\(t\)</span>, outcomes at <span class="math inline">\(t+1\)</span>); (ii) conditional ignorability given <span class="math inline">\(\{U_i, W_t, C_t\}\)</span>; (iii) overlap (within-country variation in attempts); and (iv) SUTVA, contrasts from our models recover a <strong>conditional average treatment effect</strong>.</p>
 <p>Our estimand is the average treatment effect of a coup attempt in year <span class="math inline">\(t\)</span> on the probability of a coup termination in year <span class="math inline">\(t+1\)</span>:</p>
@@ -3346,64 +3361,15 @@ window.Quarto = {
 \mathrm{ATE} \;=\; \mathbb{E}\!\left[\,Y^*_{t+1}(1) - Y^*_{t+1}(0)\,\right].
 \]</span></p>
 <p>We estimate this quantity using logit specifications with (a) country and year fixed effects and clustered standard errors, and (b) a mixed-effects logit with a country random intercept and year fixed effects. For interpretability, we report both <strong>odds ratios (OR)</strong> and <strong>average risk differences</strong> via <strong>g-computation</strong>, i.e., predicting <span class="math inline">\(P(Y^*_{t+1}=1)\)</span> for the same observations under <span class="math inline">\(A_t=1\)</span> and <span class="math inline">\(A_t=0\)</span> and averaging the difference.</p>
+<p>The estimand is short-run and conditional: the effect of an attempt in <span class="math inline">\(t\)</span> on the probability of a coup termination in <span class="math inline">\(t+1\)</span>, averaging within countries after absorbing country and year structure and controlling for civil war. It does not capture slower dynamics (e.g., how attempts reshape elite coalitions over several years) or feedback loops between conflict and coup risk. Coding accuracy and coverage in the underlying data further bound external validity. For these reasons we emphasize risk differences—in percentage points—as the primary quantity for substantive interpretation, with odds ratios as complementary evidence about direction and proportional change.</p>
 </section>
-<section id="data-and-variables" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="data-and-variables"><span class="header-section-number">2.2</span> Data and variables</h2>
-<p>We use the V-Dem country–year panel. The unit is country–year. Core variables:</p>
-<ul>
-<li><code>histname</code>: historical label of the political entity; used to track within-country regime continuity.</li>
-<li><code>v2regendtype</code>: code describing <strong>how</strong> a regime ends in a year (e.g., military coup <code>0</code>, non-military coup <code>1</code>, self-coup <code>2</code>, “still exists” <code>13</code>).</li>
-<li><code>e_pt_coup_attempts</code>: count of recorded coup attempts in the year (available for the post-1950 period).</li>
-<li><code>e_civil_war</code>: indicator of civil war in the year (time-varying confounder).</li>
-<li><code>country_id</code>, <code>year</code>: panel identifiers.</li>
-</ul>
-<p>We keep observations where these inputs are available and align predictors to year (t) and outcomes to year (t{+}1).</p>
-</section>
-<section id="measurement-and-construction" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="measurement-and-construction"><span class="header-section-number">2.3</span> Measurement and construction</h2>
-<ol type="1">
-<li><strong>Within-country change flag.</strong> Standardize <code>histname</code> (lowercase, trim whitespace) and mark a change when it differs from the previous year within the same country. This is a descriptive check of regime churn.</li>
-<li><strong>Next-year end type.</strong> Create <code>regend_t1 = lead(v2regendtype, 1)</code> to align end types to (t{+}1).</li>
-<li><strong>Outcome.</strong> Define (Y^*_{t+1}=1) if <code>regend_t1 ∈ {0,1,2}</code> (ends via a coup) and (0) for all other non-missing codes, including <code>13</code> “still exists.” This avoids conditioning on the event of ending.</li>
-<li><strong>Treatment.</strong> Define (A_t=1) if <code>e_pt_coup_attempts &gt; 0</code>, else (0). We restrict to years where attempts are recorded (mainly 1950+).</li>
-<li><strong>Checks.</strong> Report the base rate ([Y^*_{t+1}]) and the split of (A_t) to verify rarity and overlap.</li>
-</ol>
-</section>
-<section id="design-diagnostics-descriptive-priors" class="level2" data-number="2.4">
-<h2 data-number="2.4" class="anchored" data-anchor-id="design-diagnostics-descriptive-priors"><span class="header-section-number">2.4</span> Design diagnostics (descriptive priors)</h2>
-<p>Before modeling, we tabulate the distribution of <code>v2regendtype</code> overall and among rows that precede a <code>histname</code> change. These tables are <strong>descriptive priors</strong> only (e.g., coups are rare relative to other endings). We also show an unadjusted split of (Y^*_{t+1}) by (A_t) to illustrate the raw association that the causal design will later adjust.</p>
-</section>
-<section id="estimation-strategy" class="level2" data-number="2.5">
-<h2 data-number="2.5" class="anchored" data-anchor-id="estimation-strategy"><span class="header-section-number">2.5</span> Estimation strategy</h2>
-<p>We target the conditional average treatment effect of (A_t) on (Y^*_{t+1}) under temporal ordering, ignorability given ({U_i,W_t,C_t}), overlap, and SUTVA. Concretely:</p>
-<ul>
-<li><strong>Model 1 (FE logit).</strong> Logit with <strong>country fixed effects</strong> and <strong>year fixed effects</strong>; cluster standard errors by country.</li>
-<li><strong>Model 2 (RE logit + year FE).</strong> Mixed-effects logit with a <strong>country random intercept</strong> and <strong>year fixed effects</strong> (partial pooling across countries).</li>
-<li><strong>Model 3 (+ civil war).</strong> Extend Model 2 by adding <code>e_civil_war</code> as a time-varying confounder (C_t).</li>
-</ul>
-<p>For interpretability we report (i) <strong>odds ratios (OR)</strong> for <code>attempt</code>, with 95% CIs; and (ii) <strong>average risk differences</strong> via <strong>g-computation</strong>: predict (P(Y^*_{t+1}=1)) for each row under (A_t{=}1) and (A_t{=}0), then average the difference. If high-dimensional FE causes (quasi-)separation, we note a penalized alternative (e.g., Firth logit or <code>glmmTMB</code>) in the Appendix.</p>
-</section>
-<section id="scope-interpretation-and-limitations" class="level2" data-number="2.6">
-<h2 data-number="2.6" class="anchored" data-anchor-id="scope-interpretation-and-limitations"><span class="header-section-number">2.6</span> Scope, interpretation, and limitations</h2>
-<p>Effects are <strong>short-run</strong> ((t t{+}1)) and <strong>conditional</strong> on the adjustment set. They do not capture long-run dynamics or feedback between attempts and conflict. Uncertainty is non-trivial because both coup attempts and coup terminations are rare. Identification assumes no important time-varying confounders beyond country/year effects and civil war, and consistent coding in V-Dem.</p>
-</section>
-<section id="roadmap" class="level2" data-number="2.7">
-<h2 data-number="2.7" class="anchored" data-anchor-id="roadmap"><span class="header-section-number">2.7</span> Roadmap</h2>
-<ol type="1">
-<li>Describe end-type frequencies (descriptive priors).<br>
-</li>
-<li>Construct (Y^*_{t+1}) and (A_t); show an unadjusted split.<br>
-</li>
-<li>Estimate the FE logit and report OR and g-computed risk difference.<br>
-</li>
-<li>Replicate with a random-intercept logit (year FE), then add civil war.<br>
-</li>
-<li>Summarize the treatment effect and discuss robustness and limitations.</li>
-</ol>
+<section id="estimation-methodology" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="estimation-methodology"><span class="header-section-number">1.3</span> Estimation methodology</h2>
+<p>We estimate three specifications. (1) A logistic regression with country fixed effects and year fixed effects; standard errors are clustered by country. (2) A mixed-effects logistic model with a country random intercept and year fixed effects, which partially pools information across countries. (3) The mixed-effects model augmented with the civil-war indicator as a time-varying covariate. Alongside odds ratios for the attempt coefficient with 95% confidence intervals, we report average risk differences via g-computation: we predict <span class="math inline">\(P(Y^*_{t+1}=1)\)</span> for each observation twice—once setting <span class="math inline">\(A_t=1\)</span> and once setting <span class="math inline">\(A_t=0\)</span>—and average the difference. Because coup terminations are rare and high-dimensional fixed effects can induce quasi-separation, we view penalized or shrinkage alternatives (e.g., Firth-penalized logit; mixed models estimated via <code>glmmTMB</code>) as robustness checks rather than primary estimates.</p>
 </section>
 </section>
-<section id="load-packages" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Load Packages</h1>
+<section id="load-packages" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Load Packages</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -3415,8 +3381,8 @@ window.Quarto = {
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="import-vdem-data-using-its-r-package" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Import Vdem Data using its R Package</h1>
+<section id="import-vdem-data-using-its-r-package" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Import Vdem Data using its R Package</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install V-Dem data package:</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
@@ -3425,19 +3391,12 @@ window.Quarto = {
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vdemdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="operationalizing-regime-change" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Operationalizing Regime Change</h1>
-<p>V-Dem provides multiple regime identifiers. The variable <code>v2reginfo</code> splits a political entity into fine-grained historical phases (e.g., “Soviet Russia,” “USSR under Stalin,” “Post-Stalin USSR”). For this study we adopt a <strong>coarser, state-centered</strong> notion of regime continuity and define regime change using <code>histname</code>: a country experiences a change when <code>histname</code> differs across adjacent years. This choice treats leader-centered episodes as continuity but flags foundational transformations that coincide with refounding, merger, or dissolution.</p>
-<p>To study <em>how</em> regimes end, we use <code>v2regendtype</code>—V-Dem’s coding of the process judged most important for ending the regime in a given year. Codes <code>0</code>, <code>1</code>, and <code>2</code> correspond to <strong>military coup</strong>, <strong>non-military coup</strong>, and <strong>self-coup</strong>, respectively; <code>13</code> denotes “regime still exists.” For predictive work and to avoid conditioning on future outcomes, we construct two derived variables:</p>
-<ul>
-<li>(Y^*_{t+1}): an indicator that the <strong>next year’s</strong> regime termination (if any) ends <strong>via a coup</strong>, i.e., <code>v2regendtype_{t+1} ∈ {0,1,2}</code> (coded 1). All non-missing non-coup endings—including “still exists” (<code>13</code>)—are coded 0.</li>
-<li>(A_t): an indicator that <strong>at least one coup attempt</strong> is recorded in year (t), based on <code>e_pt_coup_attempts</code> (1 if &gt;0, 0 if =0).</li>
-</ul>
-<p>This construction avoids a common collider: conditioning on the event “the regime ends” in year (t{+}1). Instead of modelling (Y_{t+1} E_{t+1}=1), we model the marginal probability of a <strong>coup termination next year</strong> and ask whether (A_t) shifts that probability.</p>
-<p>As a descriptive prior, we first examine the marginal distribution of <code>v2regendtype</code> and the distribution conditional on <code>histname</code> changes. These summaries inform prior beliefs but are not used as conditioning variables in the causal model.</p>
-<section id="descriptive-priors-from-v2regendtype" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="descriptive-priors-from-v2regendtype"><span class="header-section-number">5.1</span> Descriptive priors from <code>v2regendtype</code></h2>
-<p>Before modelling, we summarize how regimes end in V-Dem—both overall and among years that precede a <code>histname</code> change. These tables are descriptive only; they provide useful priors (e.g., coups are rare relative to other endings).</p>
+<section id="measurement-strategy-and-temporal-alignment" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Measurement strategy and temporal alignment</h1>
+<p>V-Dem provides several ways to represent regime continuity and rupture. In this study we adopt a <strong>state-centered</strong> measure. Specifically, within each country we standardize <code>histname</code> and mark a <strong>regime change in year t</strong> when the standardized value differs from year t−1. This definition treats leadership rotations and intra-regime phases as continuity, while capturing foundational transformations (refounding, mergers, dissolutions). To prepare a prediction task that avoids temporal leakage, we also shift the indicator forward by one year so that subsequent models use information from year t to <strong>predict change at t+1</strong>.</p>
+<section id="construct-within-country-change-and-a-tt1-target" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="construct-within-country-change-and-a-tt1-target"><span class="header-section-number">4.1</span> Construct within-country change and a t→t+1 target</h2>
+<p>The block below (i) standardizes <code>histname</code>, (ii) flags a within-country change in year t, and (iii) builds an aligned indicator for <strong>change next year</strong>. This alignment is crucial because all covariates we will use reside at year t.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize `histname` to avoid spurious changes due to case/whitespace</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem <span class="sc">%&gt;%</span></span>
@@ -3459,9 +3418,7 @@ window.Quarto = {
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y_t1_histname =</span> <span class="fu">replace_na</span>(<span class="fu">lead</span>(regime_change_histname, <span class="dv">1</span>), <span class="dv">0</span>L)) <span class="sc">%&gt;%</span></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><strong>How to read the output below.</strong><br>
-- The mean of <code>regime_change_histname</code> is the <strong>base rate</strong> of within-country “histname” changes—useful as a rarity check.<br>
-- The sample rows help verify that flagged changes correspond to visible <code>histname</code> shifts (spot-check only).</p>
+<p>Next, we report the base rate of within-country changes to calibrate rarity. We also spot-check a handful of flagged rows to verify that detected changes correspond to visible histname shifts. These are sanity checks only; they are not part of the causal design.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Overall rate of regime change (baseline rate)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(vdem_change<span class="sc">$</span>regime_change_histname, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3540,9 +3497,13 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="distribution-of-regime-end-types-v2regendtype" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="distribution-of-regime-end-types-v2regendtype"><span class="header-section-number">5.2</span> Distribution of regime end types (<code>v2regendtype</code>)</h2>
-<p>Next, we summarize how regimes end in V-Dem—overall and among observations that precede a <code>histname</code> change (aligned to (t{+}1)). These tables provide <strong>descriptive priors</strong> about the relative frequency of coup vs. non-coup endings. Note that code <code>13</code> means “still exists”; I treat it as a <strong>non-coup</strong> when building the causal outcome later, to avoid conditioning on the event of ending.</p>
+<section id="descriptive-priors-from-v2regendtype" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="descriptive-priors-from-v2regendtype"><span class="header-section-number">4.2</span> Descriptive priors from <em>v2regendtype</em></h2>
+<p>While <code>histname</code> identifies whether institutional rupture occurs, <code>v2regendtype</code> indicates how a regime ends in a given year. To keep the temporal alignment, we define <code>regend_t1</code> as the next year’s end-type code. This lets us later build an outcome for all country–years: whether the regime ends via a coup at t+1. Before moving to causal models, it is informative to examine the marginal distribution of end types and the distribution among observations that precede a <code>histname</code> change. These summaries serve as descriptive priors about mechanisms and base rates; they are not used as conditioning variables in the causal stage.</p>
+</section>
+<section id="summarize-end-type-distributions" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="summarize-end-type-distributions"><span class="header-section-number">4.3</span> Summarize end-type distributions</h2>
+<p>The block below (i) maps numeric end-type codes to labels, (ii) reports the overall distribution, (iii) aligns to t+1 by creating <code>regend_t1</code>, and (iv) summarizes end-types among rows that precede a <code>histname</code> change (excluding <code>13 = still exists</code> for that table). Two counts at the end verify how many t+1 change rows exist and how many have a non-13 label.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a codebook (map numeric codes to labels)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>regend_map <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
@@ -3593,13 +3554,13 @@ window.Quarto = {
 13           12   239 Other process (not 1–11)                           0.00863
 14           13  6256 Regime still exists                                0.226  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Align with the t→t+1 design: take next year&#39;s end type (regend_t1)</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Align with the t → t+1 design: take next year&#39;s end type (regend_t1)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">regend_t1 =</span> dplyr<span class="sc">::</span><span class="fu">lead</span>(v2regendtype, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Look only where y_t1_histname == 1; exclude code=13 (“still exists”)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Among rows that precede a histname change at t+1; exclude code=13 (&quot;still exists&quot;)</span></span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>change_event_dist <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(y_t1_histname <span class="sc">==</span> <span class="dv">1</span>, <span class="sc">!</span><span class="fu">is.na</span>(regend_t1), regend_t1 <span class="sc">!=</span> <span class="dv">13</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(regend_t1, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -3626,7 +3587,7 @@ window.Quarto = {
 12         3     5 Assassination of leader (non-coup)                 0.00762
 13        12     5 Other process (not 1–11)                           0.00762</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># checks</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple checks for alignment and coverage</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>n_change_rows <span class="ot">&lt;-</span> <span class="fu">sum</span>(vdem_change<span class="sc">$</span>y_t1_histname <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>n_labeled_events <span class="ot">&lt;-</span> <span class="fu">sum</span>(vdem_change<span class="sc">$</span>y_t1_histname <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(vdem_change<span class="sc">$</span>regend_t1) <span class="sc">&amp;</span> vdem_change<span class="sc">$</span>regend_t1 <span class="sc">!=</span> <span class="dv">13</span>)</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;# of t+1 change rows:&quot;</span>, n_change_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3638,18 +3599,15 @@ window.Quarto = {
 <pre><code># of t+1 rows with a non-13 end-type label: 656 </code></pre>
 </div>
 </div>
-<p><strong>What to look for.</strong><br>
-- Overall, “still exists” (<code>13</code>) should be common; <strong>coup endings</strong> <code>{0,1,2}</code> are comparatively rare.<br>
-- Among rows with a <code>histname</code> change (aligned to (t{+}1)), the mix of end types provides intuition for later priors.<br>
-- These are summaries only; the causal analysis will <strong>not</strong> condition on termination itself to avoid collider bias.</p>
+<p>Two patterns matter for what follows. First, “regime still exists” (code <code>13</code>) is common, whereas coup endings <code>{0,1,2}</code> are rare. This anchors prior beliefs and alerts us to class imbalance. Second, among observations that precede a <code>histname</code> change, the mix of termination mechanisms provides context for the later coup-vs-non-coup outcome. Importantly, these are descriptive. In the causal analysis we will not condition on “ending” at t+1, precisely to avoid collider bias. Instead, we will define an outcome for all rows—coup termination next year—and ask whether attempts at year t increase that probability after appropriate adjustment.</p>
 </section>
 </section>
-<section id="causal-pipeline" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Causal pipeline</h1>
-<p>We now switch from descriptive summaries to a causal design. The outcome is defined for <strong>all</strong> country–years: whether the regime ends <strong>via a coup</strong> in the next year (t{+}1). The treatment is whether there is <strong>at least one coup attempt</strong> in year (t). This avoids conditioning on termination and lets us interpret changes <strong>within countries over time</strong>, after adjusting for country and year effects and a time-varying confounder (civil war).</p>
-<section id="constructing-the-outcome-and-the-treatment" class="level2" data-number="6.1">
-<h2 data-number="6.1" class="anchored" data-anchor-id="constructing-the-outcome-and-the-treatment"><span class="header-section-number">6.1</span> Constructing the outcome and the treatment</h2>
-<p>We map <code>v2regendtype_{t+1} ∈ {0,1,2}</code> to (Y^*_{t+1}=1) (coup termination next year) and all other non-missing codes—including “still exists” (<code>13</code>)—to 0. For the treatment, we use <code>e_pt_coup_attempts_t&gt;0</code>. we also record a weakly informative prior for the base rate via the sample mean.</p>
+<section id="from-measurement-to-identification" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> From measurement to identification</h1>
+<p>Building on the measurement choices above, we now move from descriptive context to a <strong>design-based causal analysis</strong>. The key move is to define an outcome for <strong>all</strong> country–years—“coup termination next year”—and to align the treatment at year <span class="math inline">\(t\)</span>. This avoids conditioning on whether a regime ends in <span class="math inline">\(t+1\)</span>, which would otherwise introduce selection bias.</p>
+<section id="outcome-and-treatment" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="outcome-and-treatment"><span class="header-section-number">5.1</span> Outcome and treatment</h2>
+<p>We map <code>v2regendtype_{t+1} ∈ {0,1,2}</code> to <span class="math inline">\(Y^{\star}_{t+1}=1\)</span> (coup termination next year) and <strong>all other non-missing codes</strong>—including “still exists” (<code>13</code>)—to <span class="math inline">\(0\)</span>. The treatment is <span class="math inline">\(A_t=\mathbb{1}\{\text{attempts}_t&gt;0\}\)</span>, where <span class="math inline">\(\text{attempts}_t\)</span> refers to the V-Dem count <code>e_pt_coup_attempts</code> in year <span class="math inline">\(t\)</span>. Because attempt coverage is strongest post-1950, we retain rows where both <span class="math inline">\(Y^{\star}_{t+1}\)</span> and <span class="math inline">\(A_t\)</span> are observed and record a weakly informative prior centered at the empirical base rate.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Y*_{t+1}: does next year end via a coup?</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 if regend_t1 ∈ {0,1,2}; 0 for all other non-missing (including &quot;still exists&quot;=13 and non-coup endings)</span></span>
@@ -3664,7 +3622,7 @@ window.Quarto = {
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>y_star <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(y_star[keep])</span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>x_attempt <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(attempts[keep] <span class="sc">&gt;</span> <span class="dv">0</span>)  <span class="co"># 1 = at least one attempt in year t; 0 = no attempt</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>N_star    <span class="ot">&lt;-</span> <span class="fu">length</span>(y_star)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>N_star <span class="ot">&lt;-</span> <span class="fu">length</span>(y_star)</span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Weakly informative prior centered at the sample mean (can be swapped for a training split later)</span></span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>p0_star <span class="ot">&lt;-</span> <span class="fu">mean</span>(y_star)</span>
@@ -3683,11 +3641,11 @@ window.Quarto = {
 10280   418 </code></pre>
 </div>
 </div>
-<p><em>Check.</em> The printed base rate <code>mean(y_star)</code> and the table of <code>attempt=1/0</code> confirm the outcome is rare and that both treatment arms are populated.</p>
+<p>The printed base rate <code>mean(y_star)</code> and the table of <code>attempt=1/0</code> confirm the outcome is rare and that both treatment arms are populated.</p>
 </section>
-<section id="sanity-check-prior-vs.-observed-vs.-posterior" class="level2" data-number="6.2">
-<h2 data-number="6.2" class="anchored" data-anchor-id="sanity-check-prior-vs.-observed-vs.-posterior"><span class="header-section-number">6.2</span> Sanity check: prior vs. observed vs. posterior</h2>
-<p>As a diagnostic, I compute conjugate posteriors for the coup-termination rate in the two groups (<code>attempt=1/0</code>). This is not the causal estimate; it simply shows the raw association before any adjustment.</p>
+<section id="sanity-check-prior-vs.-observed-vs.-posterior" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="sanity-check-prior-vs.-observed-vs.-posterior"><span class="header-section-number">5.2</span> Sanity check: prior vs. observed vs. posterior</h2>
+<p>As a pre-model check, we compare the prior mean, observed mean, and conjugate posterior mean of <span class="math inline">\(Y^{\star}_{t+1}\)</span> within each group <span class="math inline">\(A_t \in \{0,1\}\)</span>. This is a raw association check; it is <strong>not</strong> our causal estimate.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
@@ -3726,11 +3684,11 @@ window.Quarto = {
 <pre><code>{&#39;diff_mean&#39;: 0.24487812242561358, &#39;Pr(diff&gt;0)&#39;: 1.0, &#39;diff_ci95&#39;: (np.float64(0.1983), np.float64(0.2924))}</code></pre>
 </div>
 </div>
-<p><em>Result.</em> The posterior mean in <code>attempt=1</code> exceeds that in <code>attempt=0</code> with a high <code>Pr(diff&gt;0)</code>, reflecting the <strong>unadjusted</strong> association that we will revisit after controlling for country and time.</p>
+<p>The posterior mean in <code>attempt=1</code> exceeds that in <code>attempt=0</code> with a high <code>Pr(diff&gt;0)</code>, reflecting the <strong>unadjusted</strong> association that we will revisit after controlling for country and time.</p>
 </section>
-<section id="identification-avoid-conditioning-on-next-year-termination" class="level2" data-number="6.3">
-<h2 data-number="6.3" class="anchored" data-anchor-id="identification-avoid-conditioning-on-next-year-termination"><span class="header-section-number">6.3</span> Identification: avoid conditioning on next-year termination</h2>
-<p>Conditioning on “the regime ends in (t{+}1)” creates a collider path from time-varying conditions to the outcome. Instead, I model the <strong>marginal</strong> probability (P(Y^*_{t+1}=1 A_t, )). The DAGs below contrast the biased setup with the identification-friendly one.</p>
+<section id="identification-avoid-conditioning-on-endings-adjust-back-door-paths" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="identification-avoid-conditioning-on-endings-adjust-back-door-paths"><span class="header-section-number">5.3</span> Identification: avoid conditioning on endings &amp; adjust back-door paths</h2>
+<p>Conditioning on “ends in <span class="math inline">\(t+1\)</span>” creates a collider between time-varying drivers and the outcome. We therefore model the marginal probability <span class="math inline">\(P\!\big(Y^{\star}_{t+1}=1 \mid A_t,\ \text{adjustment}\big)\)</span> and block back-door paths by adjusting for country heterogeneity <span class="math inline">\(U_i\)</span>, year shocks <span class="math inline">\(W_t\)</span>, and a time-varying confounder <span class="math inline">\(C_t\)</span> (civil war).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> Digraph(<span class="st">&quot;dag_bad&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>)<span class="op">;</span> g.attr(rankdir<span class="op">=</span><span class="st">&quot;LR&quot;</span>)</span>
@@ -3828,7 +3786,7 @@ window.Quarto = {
 </g>
 </g>
 </svg></p>
-<p><em>Figure 1.</em> Conditioning on (E_{t+1}=1) opens a collider</p>
+<p><strong>Figure 1.</strong> Conditioning on <span class="math inline">\(E_{t+1}=1\)</span> opens a collider.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: dag_good</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
@@ -3925,23 +3883,42 @@ window.Quarto = {
 </g>
 </g>
 </svg></p>
-<p><em>Figure 2.</em> Modelling (Y^*_{t+1}) avoids it and adjusts for country heterogeneity (U_i), year shocks (W_t), and time-varying confounders (C_t) (e.g., civil war).</p>
+<p><strong>Figure 2.</strong> Modeling <span class="math inline">\(Y^{\star}_{t+1}\)</span> avoids selection on <span class="math inline">\(E\)</span> and adjusts for <span class="math inline">\(U_i\)</span>, <span class="math inline">\(W_t\)</span>, and <span class="math inline">\(C_t\)</span>.</p>
 </section>
-<section id="estimand-and-assumptions" class="level2" data-number="6.4">
-<h2 data-number="6.4" class="anchored" data-anchor-id="estimand-and-assumptions"><span class="header-section-number">6.4</span> Estimand and assumptions</h2>
-<p><strong>Estimand.</strong> The average treatment effect: [ =, ] where (Y^*_{t+1}) is “coup termination next year.”</p>
-<p><strong>Identification.</strong> (i) Temporal ordering (predictors at (t), outcome at (t{+}1)); (ii) Conditional ignorability given country effects, year effects, and civil war; (iii) Overlap (within-country variation in attempts); (iv) SUTVA.</p>
+<section id="estimand-and-identifying-conditions" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="estimand-and-identifying-conditions"><span class="header-section-number">5.4</span> Estimand and identifying conditions</h2>
+<p><strong>Estimand (ATE).</strong></p>
+<p><span class="math display">\[
+\mathrm{ATE} \;=\; \mathbb{E}\!\left[\,Y^{\star}_{t+1}(1)\;-\;Y^{\star}_{t+1}(0)\,\right].
+\]</span></p>
+<p><strong>Identification requires:</strong><br>
+(i) temporal ordering (predictors at <span class="math inline">\(t\)</span>, outcome at <span class="math inline">\(t+1\)</span>);<br>
+(ii) conditional ignorability given <span class="math inline">\(\{U_i,\, W_t,\, C_t\}\)</span>;<br>
+(iii) overlap (within-country variation in <span class="math inline">\(A_t\)</span>); and<br>
+(iv) SUTVA.</p>
 </section>
-<section id="estimation" class="level2" data-number="6.5">
-<h2 data-number="6.5" class="anchored" data-anchor-id="estimation"><span class="header-section-number">6.5</span> Estimation</h2>
-<p>I fit (1) a country-and-year fixed-effects logit with country-clustered SEs; (2) a random-intercept logit with year FE to partially pool across countries; and (3) the same random-intercept model <strong>adding civil war</strong> as a time-varying confounder. For each model I report an odds ratio (OR) for <code>attempt</code> and the <strong>average risk difference</strong> via g-computation.</p>
+<section id="estimation-strategy-and-reporting" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="estimation-strategy-and-reporting"><span class="header-section-number">5.5</span> Estimation strategy and reporting</h2>
+<p>We estimate the conditional effect of <span class="math inline">\(A_t\)</span> using three specifications:</p>
+<ol type="1">
+<li><strong>Fixed-effects logit</strong> with country and year fixed effects and country-clustered standard errors.<br>
+</li>
+<li><strong>Random-intercept logit</strong> with year fixed effects (partial pooling across countries).<br>
+</li>
+<li>The same mixed-effects model <strong>adding civil war</strong> as <span class="math inline">\(C_t\)</span>.</li>
+</ol>
+<p>For interpretation, we report <strong>odds ratios (OR)</strong> and <strong>average risk differences</strong> via <strong>g-computation</strong>—i.e., predict <span class="math inline">\(P\!\big(Y^{\star}_{t+1}=1\big)\)</span> under <span class="math inline">\(A_t=1\)</span> and under <span class="math inline">\(A_t=0\)</span> for the same rows, then average the difference.</p>
 </section>
-<section id="main-results" class="level2" data-number="6.6">
-<h2 data-number="6.6" class="anchored" data-anchor-id="main-results"><span class="header-section-number">6.6</span> Main results</h2>
-<section id="fixed-effects-logit-with-country-year-fe-g-computed-risk-difference" class="level3" data-number="6.6.1">
-<h3 data-number="6.6.1" class="anchored" data-anchor-id="fixed-effects-logit-with-country-year-fe-g-computed-risk-difference"><span class="header-section-number">6.6.1</span> Fixed-effects logit with country &amp; year FE g-computed risk difference</h3>
-<section id="prepare-the-panel-frame" class="level4">
-<h4 class="anchored" data-anchor-id="prepare-the-panel-frame">Prepare the panel frame</h4>
+</section>
+<section id="causal-estimates" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Causal estimates</h1>
+<p>We now report within-country contrasts of the effect of a coup attempt in year <span class="math inline">\(t\)</span> on the probability that the regime ends via a coup in year <span class="math inline">\(t+1\)</span>. All models align predictors at <span class="math inline">\(t\)</span> and outcomes at <span class="math inline">\(t+1\)</span>, avoid conditioning on termination itself, and are read as <strong>conditional</strong> effects under our adjustment set.</p>
+<hr>
+<section id="model-1-fixed-effects-logit-country-year-fe-g-computed-risk-difference" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="model-1-fixed-effects-logit-country-year-fe-g-computed-risk-difference"><span class="header-section-number">6.1</span> Model 1: Fixed-effects logit (country &amp; year FE) + g-computed risk difference</h2>
+<p>Country fixed effects absorb time-invariant heterogeneity (<span class="math inline">\(U_i\)</span>) and year fixed effects absorb common shocks (<span class="math inline">\(W_t\)</span>). The coefficient on <code>attempt</code> is therefore identified from <strong>within-country, over-time</strong> variation.</p>
+<section id="prepare-the-panel-frame" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="prepare-the-panel-frame"><span class="header-section-number">6.1.1</span> Prepare the panel frame</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df_star <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -3968,8 +3945,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="fixed-effects-logit-country-year-fe-robust-se" class="level4">
-<h4 class="anchored" data-anchor-id="fixed-effects-logit-country-year-fe-robust-se">Fixed-effects logit (country &amp; year FE; robust SE)</h4>
+<section id="fixed-effects-logit-country-year-fe-robust-se" class="level3" data-number="6.1.2">
+<h3 data-number="6.1.2" class="anchored" data-anchor-id="fixed-effects-logit-country-year-fe-robust-se"><span class="header-section-number">6.1.2</span> Fixed-effects logit (country &amp; year FE; robust SE)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fit_fe <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  y_star <span class="sc">~</span> attempt <span class="sc">+</span> <span class="fu">factor</span>(country_id) <span class="sc">+</span> <span class="fu">factor</span>(year),</span>
@@ -4008,8 +3985,8 @@ $OR_95CI
 </div>
 </div>
 </section>
-<section id="g-computation-average-risk-difference" class="level4">
-<h4 class="anchored" data-anchor-id="g-computation-average-risk-difference">G-computation: average risk difference</h4>
+<section id="g-computation-average-risk-difference" class="level3" data-number="6.1.3">
+<h3 data-number="6.1.3" class="anchored" data-anchor-id="g-computation-average-risk-difference"><span class="header-section-number">6.1.3</span> G-computation: average risk difference</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">transform</span>(df_star, <span class="at">attempt =</span> <span class="dv">1</span>L)</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>df0 <span class="ot">&lt;-</span> <span class="fu">transform</span>(df_star, <span class="at">attempt =</span> <span class="dv">0</span>L)</span>
@@ -4022,11 +3999,12 @@ $OR_95CI
 [1] -0.0243</code></pre>
 </div>
 </div>
-<p><em>Result (FE).</em> The attempt coefficient is negative (OR ≈ 0.70; 95% CI roughly 0.51–0.96) and the model-implied average risk difference is about −2.4 percentage points.</p>
+<p>Coup attempts in year t are associated with a lower chance that the regime ends via a coup in <em>t+1</em>: OR = 0.701 (95% CI 0.512–0.959, <em>p</em> = 0.026). G-computation implies an average risk difference of −2.43 percentage points (attempt 1 vs. 0). Interpreted within countries over time (absorbing year shocks), attempts do not increase next-year coup-termination risk and may slightly reduce it—reversing the positive raw association. The <code>glm.fit</code> warning about probabilities near 0/1 reflects near-separation in a rare outcome; we use clustered SEs and corroborate with the random-intercept model below.</p>
 </section>
 </section>
-<section id="random-intercepts-for-countries-year-fe" class="level3" data-number="6.6.2">
-<h3 data-number="6.6.2" class="anchored" data-anchor-id="random-intercepts-for-countries-year-fe"><span class="header-section-number">6.6.2</span> Random intercepts for countries + year FE</h3>
+<section id="model-2-random-intercepts-for-countries-year-fe" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="model-2-random-intercepts-for-countries-year-fe"><span class="header-section-number">6.2</span> Model 2: Random intercepts for countries + year FE</h2>
+<p>A country random intercept partially pools country baselines rather than estimating a separate dummy for each, which can stabilize estimates when outcomes are rare and FE suffer (quasi-)separation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">glmerControl</span>(</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;bobyqa&quot;</span>,</span>
@@ -4048,7 +4026,7 @@ eval:  51 fn:      5321.7059 par:  3.80426</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   8.37    0.17    8.92 </code></pre>
+   2.72    0.03    2.70 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>b  <span class="ot">&lt;-</span> <span class="fu">fixef</span>(fit_re)[<span class="st">&quot;attempt&quot;</span>]</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">vcov</span>(fit_re)[<span class="st">&quot;attempt&quot;</span>,<span class="st">&quot;attempt&quot;</span>])</span>
@@ -4089,12 +4067,13 @@ $OR_95CI
 [1] -0.0224</code></pre>
 </div>
 </div>
-<p><em>Result (RE + year FE).</em> Direction and magnitude are very similar (OR ≈ 0.73; risk difference ≈ −2.2 pp), suggesting the FE result is not driven by overfitting country dummies.</p>
+<p>Allowing a random intercept for countries (with year fixed effects) yields OR = 0.728 with 95% CI 0.557–0.950. The g-computed average risk difference is −2.24 percentage points (attempt 1 vs. 0). This mirrors Model 1: within countries and net of period shocks, coup attempts do not raise the next-year probability that a regime ends via a coup. Partial pooling across countries also alleviates the near-separation concern from the high-dimensional FE logit, and the estimate remains negative and statistically different from 1.</p>
 </section>
-<section id="adding-a-time-varying-confounder-civil-war" class="level3" data-number="6.6.3">
-<h3 data-number="6.6.3" class="anchored" data-anchor-id="adding-a-time-varying-confounder-civil-war"><span class="header-section-number">6.6.3</span> Adding a time-varying confounder: civil war</h3>
-<section id="build-the-confounder-and-prepare-data" class="level4">
-<h4 class="anchored" data-anchor-id="build-the-confounder-and-prepare-data">Build the confounder and prepare data</h4>
+<section id="model-3-adding-a-time-varying-confounder-civil-war" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="model-3-adding-a-time-varying-confounder-civil-war"><span class="header-section-number">6.3</span> Model 3: Adding a time-varying confounder: civil war</h2>
+<p>Civil war plausibly affects both the incidence of attempts and the probability of a coup termination, so we include a binary <span class="math inline">\(C_t\)</span> to further block back-door paths.</p>
+<section id="build-the-confounder-and-prepare-data" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="build-the-confounder-and-prepare-data"><span class="header-section-number">6.3.1</span> Build the confounder and prepare data</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild a dataframe on the original vdem_change that includes the conflict variable</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>df_star2 <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
@@ -4125,8 +4104,8 @@ $OR_95CI
 </div>
 </div>
 </section>
-<section id="random-intercepts-year-fe-with-civil-war" class="level4">
-<h4 class="anchored" data-anchor-id="random-intercepts-year-fe-with-civil-war">Random intercepts + year FE with civil war</h4>
+<section id="random-intercepts-year-fe-with-civil-war" class="level3" data-number="6.3.2">
+<h3 data-number="6.3.2" class="anchored" data-anchor-id="random-intercepts-year-fe-with-civil-war"><span class="header-section-number">6.3.2</span> Random intercepts + year FE with civil war</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">glmerControl</span>(</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;bobyqa&quot;</span>,</span>
@@ -4184,8 +4163,8 @@ $OR95_conflict
 </div>
 </div>
 </section>
-<section id="risk-difference-after-adjusting-for-civil-war-g-computation" class="level4">
-<h4 class="anchored" data-anchor-id="risk-difference-after-adjusting-for-civil-war-g-computation">Risk difference after adjusting for civil war (g-computation)</h4>
+<section id="risk-difference-after-adjusting-for-civil-war-g-computation" class="level3" data-number="6.3.3">
+<h3 data-number="6.3.3" class="anchored" data-anchor-id="risk-difference-after-adjusting-for-civil-war-g-computation"><span class="header-section-number">6.3.3</span> Risk difference after adjusting for civil war (g-computation)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">transform</span>(df_star2, <span class="at">attempt =</span> <span class="dv">1</span>L)</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>df0 <span class="ot">&lt;-</span> <span class="fu">transform</span>(df_star2, <span class="at">attempt =</span> <span class="dv">0</span>L)</span>
@@ -4198,25 +4177,114 @@ $OR95_conflict
 [1] -0.0236</code></pre>
 </div>
 </div>
-<p><em>Result (RE + year FE + civil war).</em> The attempt effect remains small and slightly negative (OR ≈ 0.71; risk difference ≈ −2.36 pp). The civil-war term is positive (OR &gt; 1) but imprecise due to rarity.</p>
-</section>
+<p>Adjusting for civil war hardly changes the attempt effect. The odds ratio for <code>attempt</code> is 0.714 with a very wide 95% CI [0.101, 5.068]; the g-computed risk difference is −0.0236 (≈ −2.4 percentage points). The coefficient on <code>any_conflict</code> points in the expected direction—OR = 1.387—but its 95% CI [0.195, 9.847] is extremely imprecise, reflecting the rarity of civil-war years. In short, once we account for country heterogeneity and year shocks, attempts are not associated with a higher probability of coup termination next year; if anything, the estimated effect remains small and negative.</p>
 </section>
 </section>
 </section>
 <section id="main-findings" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Main findings</h1>
-<p>Naïve conjugate splits suggested a strong positive association between coup attempts and coup terminations. Once I align time and adjust for country heterogeneity and year shocks—and further add civil war as a time-varying confounder—the effect shrinks and flips sign: <strong>attempts do not make a coup termination next year more likely</strong>; if anything, the estimated effect is slightly negative (≈ −2–3 pp). This pattern is consistent with composition effects (which countries/years experience attempts) driving the raw association. I interpret the estimates as <strong>conditional average effects</strong> under the stated adjustment set and assumptions.</p>
+<p>A simple split (before any adjustment) suggests that years with a coup attempt are followed by <strong>more</strong> coup terminations. However, once we (i) align time to avoid conditioning on endings and (ii) compare <strong>within countries over time</strong> using country and year effects, that pattern reverses. In the fixed-effects logit, the attempt coefficient implies <strong>OR ≈ 0.70</strong> (95% CI ≈ 0.51–0.96) and a g-computed <strong>risk difference of about −2.4 percentage points</strong>. A random-intercept logit with year fixed effects yields a very similar result (OR ≈ 0.73; risk difference ≈ −2.2 pp). Adding civil war as a time-varying confounder leaves the point estimate essentially unchanged (OR ≈ 0.71; risk difference ≈ −2.4 pp), though uncertainty widens because civil-war years are rare.</p>
+<p>Taken together, the evidence indicates that <strong>coup attempts do not make a coup termination next year more likely</strong>; if anything, the estimated short-run effect is small and negative (≈ −2–3 pp). The contrast with the naive split is consistent with <strong>composition and timing effects</strong>—attempts occur in particular countries and periods—which inflate the raw association. Our estimates should be read as <strong>conditional average effects</strong> under the stated adjustment set (country heterogeneity, year shocks, and civil war).</p>
 </section>
-<section id="robustness" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Robustness</h1>
-<p>Results are stable when partially pooling across countries (random intercepts) and when adding a time-varying confounder (civil war). As a further check against separation in high-dimensional FE, I replicated the FE logit with Firth bias reduction (or estimated the random-intercept model with <code>glmmTMB</code>); the OR and risk-difference estimates remained similar. (Appendix reports details.)</p>
+<section id="limitations" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Limitations</h1>
+<p>Two caveats shape how the results should be read. First, the fixed-effects logit exhibits numerical (quasi-)separation—expected in rare-event panels with many country and year dummies. Although the mixed-effects specification and the g-computed risk differences point in the same direction, finite-sample bias and optimistic standard errors remain possible. Second, both coup attempts and civil war are infrequent. Rarity inflates uncertainty and widens intervals once civil war is included, so effect magnitudes should be interpreted with caution rather than as precise point estimates.</p>
+<p>Beyond these statistical issues, several substantive limitations apply. The key variables—<code>e_pt_coup_attempts</code> and <code>v2regendtype</code>—are assembled from historical sources and may contain misclassification or uneven coverage (attempts are most reliably coded after 1950). By design, we code “still exists” as a non-coup outcome and treat missing civil-war values as zero to align samples; if these choices down-weight near-collapses or mask unrecorded conflict, estimates may be attenuated. Identification also rests on the assumption that adjusting for country heterogeneity, year shocks, and civil war blocks the major back-door paths. Other time-varying forces—mass protest, repression severity, elite splits, or economic crises—could still confound both attempts and coup terminations. Our estimand is short-run (effects of attempts in year <em>t</em> on coup termination in <em>t+1</em>), so longer lags, anticipation, and feedback dynamics are not modeled, nor are regional spillovers that could violate SUTVA.</p>
+<p>These caveats suggest practical robustness checks rather than invalidate the design: penalized/Firth or rare-events logit (or weakly informative Bayesian priors) to mitigate separation; sensitivity to alternative codings of termination and conflict; richer adjustment sets or double-robust estimators to hedge against residual confounding; and dynamic or spatial extensions (event-history models, regional contagion terms) to probe timing and interference. Even with these limitations, the qualitative pattern—that time alignment and adjustment for country and period effects overturn the naïve positive association—remains stable across specifications.</p>
 </section>
-<section id="limitations" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> Limitations</h1>
-<p>Civil war and coup attempts are rare; uncertainty is non-trivial. Identification rests on no unmeasured time-varying confounding beyond country/year effects and civil war, and on consistent coding of attempts and terminations in V-Dem.</p>
+<section id="robustness" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Robustness</h1>
+<p>To probe whether our main results are driven by separation in the high-dimensional fixed-effects logit or by optimizer idiosyncrasies in the mixed model, we ran two complementary checks. First, a bias-reduced fixed-effects logit (Firth-type, <code>brglm2</code>) produces an odds ratio for <code>attempt</code> of 0.711 (95% CI 0.546–0.927), essentially identical to the baseline FE estimate despite separation warnings. Second, re-estimating the random-intercept logit with year fixed effects and civil war using <code>glmmTMB</code> yields an odds ratio of 0.712 (95% CI 0.544–0.933) and an average risk difference of −0.0235. Taken together, these exercises indicate that the small, slightly negative association between attempts and next-year coup termination is not an artifact of complete separation or a particular optimizer; it appears stable across estimators and implementations(details see Appendix).</p>
 </section>
 <section id="reference" class="level1" data-number="10">
 <h1 data-number="10"><span class="header-section-number">10</span> Reference</h1>
+<p>Brooks, M. E., Kristensen, K., van Benthem, K. J., Magnusson, A., Berg, C. W., Nielsen, A., Skaug, H. J., Mächler, M., &amp; Bolker, B. M. (2017). glmmTMB balances speed and flexibility among packages for zero-inflated generalized linear mixed modeling. <em>The R Journal, 9</em>(2), 378–400. <a href="https://journal.r-project.org/archive/2017/RJ-2017-066/index.html" class="uri">https://journal.r-project.org/archive/2017/RJ-2017-066/index.html</a></p>
+<p>Coppedge, M., Gerring, J., Knutsen, C. H., Lindberg, S. I., Teorell, J., Altman, D., Angiolillo, F., Bernhard, M., Cornell, A., Fish, M. S., Fox, L., Gastaldi, L., Gjerløw, H., Glynn, A., Good God, A., Grahn, S., Hicken, A., Kinzelbach, K., Krusell, J., … Ziblatt, D. (2025). <em>V-Dem [Country–Year/Country–Date] Dataset</em> (Version 15) [Data set]. Varieties of Democracy (V-Dem) Project. <a href="https://doi.org/10.23696/vdemds25" class="uri">https://doi.org/10.23696/vdemds25</a></p>
+<p>Djuve, V. L., Knutsen, C. H., &amp; Wig, T. (2019). Patterns of Regime Breakdown since the French Revolution. <em>Comparative Political Studies</em>, 001041401987995. <a href="https://doi.org/10.1177/0010414019879953" class="uri">https://doi.org/10.1177/0010414019879953</a></p>
+<p>Firth, D. (1993). Bias reduction of maximum likelihood estimates. <em>Biometrika, 80</em>(1), 27–38. <a href="https://doi.org/10.1093/biomet/80.1.27" class="uri">https://doi.org/10.1093/biomet/80.1.27</a></p>
+<p>Geddes, B., Wright, J., &amp; Frantz, E. (2014). Autocratic breakdown and regime transitions: A new data set. <em>Perspectives on Politics, 12</em>(2), 313–331. <a href="https://doi.org/10.1017/S1537592714000851" class="uri">https://doi.org/10.1017/S1537592714000851</a></p>
+<p>Goldstone, J. A., Bates, R. H., Epstein, D. L., Gurr, T. R., Lustik, M. B., Marshall, M. G., Ulfelder, J., &amp; Woodward, M. (2010). A global model for forecasting political instability. <em>American Journal of Political Science, 54</em>(1), 190–208. <a href="https://doi.org/10.1111/j.1540-5907.2009.00426.x" class="uri">https://doi.org/10.1111/j.1540-5907.2009.00426.x</a></p>
+<p>Hegre, H., Karlsen, J., Nygård, H. M., Strand, H., &amp; Urdal, H. (2013). Predicting armed conflict, 2010–2050. <em>International Studies Quarterly, 57</em>(2), 250–270. <a href="https://doi.org/10.1111/isqu.12007" class="uri">https://doi.org/10.1111/isqu.12007</a></p>
+<p>King, G., &amp; Zeng, L. (2001). Logistic regression in rare events data. <em>Political Analysis, 9</em>(2), 137–163. <a href="https://doi.org/10.1093/oxfordjournals.pan.a004868" class="uri">https://doi.org/10.1093/oxfordjournals.pan.a004868</a></p>
+<p>Pearl, J. (2009). <em>Causality: Models, reasoning, and inference</em> (2nd ed.). Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161" class="uri">https://doi.org/10.1017/CBO9780511803161</a></p>
+<p>Pemstein, D., Marquardt, K. L., Tzelgov, E., Wang, Y.-t., Medzihorsky, J., Krusell, J., Miri, F., &amp; von Römer, J. (2025). <em>The V-Dem measurement model: Latent variable analysis for cross-national and cross-temporal expert-coded data</em> (V-Dem Working Paper No. 21, 10th ed.). Varieties of Democracy Institute, University of Gothenburg.</p>
+<p>Powell, J. M., &amp; Thyne, C. L. (2011). Global instances of coups from 1950 to present: A new dataset. <em>Journal of Peace Research, 48</em>(2), 249–259. <a href="https://doi.org/10.1177/0022343310397436" class="uri">https://doi.org/10.1177/0022343310397436</a></p>
+<p>Svolik, M. W. (2012). <em>The politics of authoritarian rule.</em> Cambridge University Press. <a href="https://doi.org/10.1017/CBO9781139176040" class="uri">https://doi.org/10.1017/CBO9781139176040</a></p>
+</section>
+<section id="appendix-robustness-checks" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Appendix: Robustness checks</h1>
+<section id="bias-reduced-fixed-effects-logit-firth" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="bias-reduced-fixed-effects-logit-firth"><span class="header-section-number">11.1</span> Bias-reduced fixed-effects logit (Firth)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brglm2)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>fit_fe_firth <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  y_star <span class="sc">~</span> attempt <span class="sc">+</span> <span class="fu">factor</span>(country_id) <span class="sc">+</span> <span class="fu">factor</span>(year),</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_star,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">&quot;logit&quot;</span>),</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;brglmFit&quot;</span>,  <span class="co"># &lt;- from brglm2</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;AS_mean&quot;</span> <span class="co"># mean-bias reduction (Firth-like)</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>co <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_fe_firth)<span class="sc">$</span>coef[<span class="st">&quot;attempt&quot;</span>, ]</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">unname</span>(co[<span class="dv">1</span>]); se <span class="ot">&lt;-</span> <span class="fu">unname</span>(co[<span class="dv">2</span>]); z <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>)<span class="sc">*</span>z<span class="sc">*</span>se</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>OR <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">c</span>(b, ci))</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">list</span>(</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR_attempt_firth =</span> <span class="fu">round</span>(OR[<span class="dv">1</span>], <span class="dv">3</span>),</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR95_attempt_firth =</span> <span class="fu">round</span>(OR[<span class="sc">-</span><span class="dv">1</span>], <span class="dv">3</span>)</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$OR_attempt_firth
+[1] 0.711
+
+$OR95_attempt_firth
+[1] 0.546 0.927</code></pre>
+</div>
+</div>
+<p>In our run, the Firth FE logit yields <code>OR_attempt_firth ≈ 0.711</code> with a 95% CI of <code>0.546–0.927</code>. This is very close to the baseline FE estimate despite separation warnings, indicating that the fixed-effects result is not driven by complete separation or small-sample bias.</p>
+</section>
+<section id="mixed-effects-logit-via-glmmtmb-optimizer-check" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="mixed-effects-logit-via-glmmtmb-optimizer-check"><span class="header-section-number">11.2</span> Mixed-effects logit via glmmTMB (optimizer check)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Same specification as the RE + year FE + civil war model</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>fit_tmb <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  y_star <span class="sc">~</span> attempt <span class="sc">+</span> any_conflict <span class="sc">+</span> <span class="fu">factor</span>(year) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> country_id),</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_star2,</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>()</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>co <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_tmb)<span class="sc">$</span>coefficients<span class="sc">$</span>cond[<span class="st">&quot;attempt&quot;</span>, ]</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">unname</span>(co[<span class="st">&quot;Estimate&quot;</span>]); se <span class="ot">&lt;-</span> <span class="fu">unname</span>(co[<span class="st">&quot;Std. Error&quot;</span>]); z <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>)<span class="sc">*</span>z<span class="sc">*</span>se</span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>OR <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">c</span>(b, ci))</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">list</span>(</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR_attempt_tmb   =</span> <span class="fu">round</span>(OR[<span class="dv">1</span>], <span class="dv">3</span>),</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">OR95_attempt_tmb =</span> <span class="fu">round</span>(OR[<span class="sc">-</span><span class="dv">1</span>], <span class="dv">3</span>)</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$OR_attempt_tmb
+[1] 0.712
+
+$OR95_attempt_tmb
+[1] 0.544 0.933</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># g-computation: average risk difference under attempt=1 vs 0 for the same rows</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">transform</span>(df_star2, <span class="at">attempt =</span> <span class="dv">1</span>L)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>df0 <span class="ot">&lt;-</span> <span class="fu">transform</span>(df_star2, <span class="at">attempt =</span> <span class="dv">0</span>L)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>p1  <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_tmb, <span class="at">newdata =</span> df1, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>, <span class="at">allow.new.levels =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>p0  <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_tmb, <span class="at">newdata =</span> df0, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>, <span class="at">allow.new.levels =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>risk_diff_tmb <span class="ot">&lt;-</span> <span class="fu">mean</span>(p1 <span class="sc">-</span> p0)</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">list</span>(<span class="at">risk_diff_tmb =</span> <span class="fu">round</span>(risk_diff_tmb, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$risk_diff_tmb
+[1] -0.0235</code></pre>
+</div>
+</div>
+<p>With <code>glmmTMB</code>, we obtain <code>OR_attempt_tmb</code> ≈ 0.712 (95% CI 0.544–0.933) and an average risk difference of <code>−0.0235</code>. These values line up with the main mixed-effects model, suggesting the small, slightly negative association is not an optimizer artifact.</p>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const toc = document.getElementById("TOC");
@@ -4243,6 +4311,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+</section>
 </section>
 
 </main>
