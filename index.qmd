@@ -31,6 +31,21 @@ highlight-style: nord
 engine: knitr
 ---
 
+```{r}
+#| label: setup-python
+#| message: false
+library(reticulate)
+
+need <- c("pymc", "arviz", "numpy", "graphviz", "ipython")
+miss <- need[!sapply(need, py_module_available)]
+if (length(miss)) {
+  # 某些机器有证书变量干扰，先清一下
+  if (!nzchar(Sys.getenv("SSL_CERT_FILE"))) Sys.unsetenv("SSL_CERT_FILE")
+  py_install(miss, pip = TRUE)
+}
+
+```
+
 # Note:
 
 Hi, Prof. Jeff, I encountered a rendering issue, I'll fix this file in 8 hours.
@@ -167,17 +182,122 @@ cat("# of t+1 rows with a non-13 end-type label:", n_labeled_events, "\n")
 
 
 ```
+
+
+
+## 步骤 A（R → 准备 y 和先验 α, β）
+
+放在 Python 块之前；它只做三件事：从 vdem_change 构造 y（t+1 是否以 coup 收场）、计算经验比例 p0、给出先验强度 m 和 alpha, beta。
+
+```{r}
+
+#| label: r-make-y-and-prior
+# 用 regend_t1 构造二元 y：{0,1,2}=1；其它且≠13=0；13(仍存在)丢弃
+y <- with(vdem_change, ifelse(regend_t1 %in% c(0,1,2), 1L,
+                       ifelse(!is.na(regend_t1) & regend_t1 != 13, 0L, NA_integer_)))
+y <- y[!is.na(y)]            # 丢弃 NA
+y <- as.integer(y)
+
+# 经验比例（先验中心）
+p0 <- mean(y)                # 例如 0.08 左右（你的数据会自动算）
+m  <- 20                     # 等效样本量（先小点；后续可调 50/100）
+alpha <- m * p0
+beta  <- m * (1 - p0)
+N <- length(y)
+
+# 小检查
+length(y); mean(y); alpha; beta
+
+```
+
+
+## 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）
+
+
 ```{python}
-import numpy as np
-y = np.array([0, 1, 0, 0, 1, 1, 0, 1], dtype="int64")  # 8个样本
+#| label: py-pgm-beta-bern
+import numpy as np, pymc as pm
+
+# 从 R 取数
+y = np.array(r.y, dtype="int64")
+alpha = float(r.alpha)
+beta = float(r.beta)
+N = int(r.N)
+
+# 给模型声明 plate
+coords = {"obs_id": np.arange(N)}
+with pm.Model(coords=coords) as beta_bern:
+    # 顶部：Beta先验
+    p_coup = pm.Beta("p_coup", alpha=alpha, beta=beta)
+    # 底部：观测数据（带 plate）
+    y_obs = pm.Bernoulli("saycoup_obs", p=p_coup, observed=y, dims="obs_id")
+
+# 生成 pgm_base.svg 并清理中间文件
+pm.model_to_graphviz(beta_bern).render(filename="pgm_base", format="svg", cleanup=True)
+
+
+
+```
+
+
+![](pgm_base.svg)
+
+
+## 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字
+
+先不画图、不做复杂评估，只看先验均值 vs 后验均值 vs 观测均值，确认“信息更新”的方向对不对。
+
+```{r}
+#| label: opts
+#| echo: false
+RUN_MCMC <- FALSE   # 默认走解析解；想跑MCMC时改 TRUE
+DRAWS    <- 800
+TUNE     <- 400
+
+
+```
+
+```{python}
+#| label: stepC-posterior-check
+import numpy as np, pymc as pm
+
+# ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——
+RUN_MCMC = bool(getattr(r, "RUN_MCMC", False))
+DRAWS    = int(getattr(r, "DRAWS", 800))
+TUNE     = int(getattr(r, "TUNE", 400))
+
+y = np.array(r.y, dtype="int64")
+alpha = float(r.alpha); beta = float(r.beta)
+
+prior_mean = alpha/(alpha+beta)
+obs_mean   = y.mean()
+
+if RUN_MCMC:
+    with beta_bern:
+        idata = pm.sample(draws=DRAWS, tune=TUNE,
+                          chains=2, cores=1, target_accept=0.9,
+                          random_seed=42, compute_convergence_checks=False)
+    post_mean = float(idata.posterior["p_coup"].values.mean())
+    mode = "mcmc"
+else:
+    N = len(y); s = int(y.sum())
+    post_mean = (alpha + s) / (alpha + beta + N)   # Beta–Bernoulli 共轭的解析后验均值
+    mode = "analytic"
+
+print({"mode": mode,
+       "prior_mean": round(float(prior_mean),4),
+       "obs_mean":   round(float(obs_mean),4),
+       "post_mean":  round(float(post_mean),4)})
+
 
 ```
 
 
 ```{python}
+#| eval: false
+#| include: false
 
 import pymc as pm
-from IPython.display import SVG
 
 alpha, beta = 20*0.08, 20*(1-0.08)  # 先验参数
 
@@ -186,20 +306,9 @@ with pm.Model() as beta_bern:
     coup_t1 = pm.Bernoulli("coup_t1", p=p_coup, observed=y)
 
 dot = pm.model_to_graphviz(beta_bern)
-svg_bytes = dot.pipe(format="svg")
-print(SVG(svg_bytes).data)  # QMD + results: asis 下可以直接显示
-
-
-```
-
-
-```{python}
-dot = pm.model_to_graphviz(beta_bern)
 dot.render(filename="pgm", format="svg", cleanup=True)
 
 ```
-
-![](pgm.svg)
 
 
 

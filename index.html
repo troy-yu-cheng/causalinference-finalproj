@@ -3133,7 +3133,7 @@ background: #0a0e1a;
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">August 11, 2025</p>
+        <p class="date-modified">August 12, 2025</p>
       </div>
     </div>
       
@@ -3149,7 +3149,12 @@ background: #0a0e1a;
   <li><a href="#note" id="toc-note" class="nav-link active" data-scroll-target="#note"><span class="header-section-number">1</span> Note:</a></li>
   <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> Introduction</a></li>
   <li><a href="#import-vdem-data-using-its-r-package" id="toc-import-vdem-data-using-its-r-package" class="nav-link" data-scroll-target="#import-vdem-data-using-its-r-package"><span class="header-section-number">3</span> Import Vdem Data using its R Package</a></li>
-  <li><a href="#operationalizing-regime-change" id="toc-operationalizing-regime-change" class="nav-link" data-scroll-target="#operationalizing-regime-change"><span class="header-section-number">4</span> Operationalizing Regime Change</a></li>
+  <li><a href="#operationalizing-regime-change" id="toc-operationalizing-regime-change" class="nav-link" data-scroll-target="#operationalizing-regime-change"><span class="header-section-number">4</span> Operationalizing Regime Change</a>
+  <ul class="collapse">
+  <li><a href="#步骤-ar-准备-y-和先验-α-β" id="toc-步骤-ar-准备-y-和先验-α-β" class="nav-link" data-scroll-target="#步骤-ar-准备-y-和先验-α-β"><span class="header-section-number">4.1</span> 步骤 A（R → 准备 y 和先验 α, β）</a></li>
+  <li><a href="#步骤-bpython-画pgm并落地成-svg-包含进-html" id="toc-步骤-bpython-画pgm并落地成-svg-包含进-html" class="nav-link" data-scroll-target="#步骤-bpython-画pgm并落地成-svg-包含进-html"><span class="header-section-number">4.2</span> 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）</a></li>
+  <li><a href="#步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字" id="toc-步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字" class="nav-link" data-scroll-target="#步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字"><span class="header-section-number">4.3</span> 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -3159,6 +3164,17 @@ background: #0a0e1a;
 
 
 
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>need <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;pymc&quot;</span>, <span class="st">&quot;arviz&quot;</span>, <span class="st">&quot;numpy&quot;</span>, <span class="st">&quot;graphviz&quot;</span>, <span class="st">&quot;ipython&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>miss <span class="ot">&lt;-</span> need[<span class="sc">!</span><span class="fu">sapply</span>(need, py_module_available)]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(miss)) {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 某些机器有证书变量干扰，先清一下</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nzchar</span>(<span class="fu">Sys.getenv</span>(<span class="st">&quot;SSL_CERT_FILE&quot;</span>))) <span class="fu">Sys.unsetenv</span>(<span class="st">&quot;SSL_CERT_FILE&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">py_install</span>(miss, <span class="at">pip =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="note" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Note:</h1>
 <p>Hi, Prof. Jeff, I encountered a rendering issue, I’ll fix this file in 8 hours.</p>
@@ -3173,54 +3189,54 @@ background: #0a0e1a;
 <section id="import-vdem-data-using-its-r-package" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Import Vdem Data using its R Package</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install V-Dem data package:</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># devtools::install_github(&quot;vdeminstitute/vdemdata&quot;)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vdemdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install V-Dem data package:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># devtools::install_github(&quot;vdeminstitute/vdemdata&quot;)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vdemdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="operationalizing-regime-change" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Operationalizing Regime Change</h1>
 <p>V-Dem includes a variable, <code>v2reginfo</code>, that labels distinct historical phases within the same political entity (e.g., “Soviet Russia,” “USSR under Stalin,” “Post-Stalin USSR”) as separate regimes. While this fine-grained coding is valuable for phase-typed institutional histories, in this study I adopt a broader conception of “regime” tied to the persistence of the overarching political entity. Concretely, I operationalize regime change as a within-country shift in <code>histname</code> across adjacent years. This choice treats leader-centered or intra-regime episodes (that <code>v2reginfo</code> may separate) as continuity rather than change, while recognizing foundational transformations that coincide with historical-state redefinitions (e.g., mergers, dissolutions, refoundings). I report sensitivity analyses that compare this <code>histname</code>-based indicator to a <code>v2reginfo</code>-based alternative to gauge how inferences depend on the operationalization.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: make-regime-change</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.1 标准化 histname，避免大小写/空白导致的伪变化</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem <span class="sc">%&gt;%</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(country_id, year) <span class="sc">%&gt;%</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">histname_std =</span> <span class="fu">str_squish</span>(<span class="fu">str_to_lower</span>(histname)))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.2 基于 histname 的相邻年差异，定义当年是否“发生变迁”</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">regime_change_histname =</span> <span class="fu">as.integer</span>(<span class="sc">!</span><span class="fu">is.na</span>(histname_std) <span class="sc">&amp;</span> histname_std <span class="sc">!=</span> <span class="fu">lag</span>(histname_std))</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">regime_change_histname =</span> <span class="fu">replace_na</span>(regime_change_histname, <span class="dv">0</span>L))</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.3 面向预测：构造 Y_{t+1}（用 t 年特征预测 t+1 年是否变迁）</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y_t1_histname =</span> <span class="fu">replace_na</span>(<span class="fu">lead</span>(regime_change_histname, <span class="dv">1</span>), <span class="dv">0</span>L)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: make-regime-change</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.1 标准化 histname，避免大小写/空白导致的伪变化</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem <span class="sc">%&gt;%</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(country_id, year) <span class="sc">%&gt;%</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">histname_std =</span> <span class="fu">str_squish</span>(<span class="fu">str_to_lower</span>(histname)))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.2 基于 histname 的相邻年差异，定义当年是否“发生变迁”</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">regime_change_histname =</span> <span class="fu">as.integer</span>(<span class="sc">!</span><span class="fu">is.na</span>(histname_std) <span class="sc">&amp;</span> histname_std <span class="sc">!=</span> <span class="fu">lag</span>(histname_std))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">regime_change_histname =</span> <span class="fu">replace_na</span>(regime_change_histname, <span class="dv">0</span>L))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.3 面向预测：构造 Y_{t+1}（用 t 年特征预测 t+1 年是否变迁）</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y_t1_histname =</span> <span class="fu">replace_na</span>(<span class="fu">lead</span>(regime_change_histname, <span class="dv">1</span>), <span class="dv">0</span>L)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3.1 变迁的总体比例（基准率）</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(vdem_change<span class="sc">$</span>regime_change_histname, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3.1 变迁的总体比例（基准率）</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(vdem_change<span class="sc">$</span>regime_change_histname, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.02583026</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3.2 随机看几条发生变迁的记录（是否合理）</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(regime_change_histname <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country_name, year, histname) <span class="sc">%&gt;%</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3.2 随机看几条发生变迁的记录（是否合理）</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(regime_change_histname <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country_name, year, histname) <span class="sc">%&gt;%</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
@@ -3289,39 +3305,39 @@ background: #0a0e1a;
 </div>
 <p>把 v2regendtype 的分布看清楚——既看总体分布，也看发生变迁（你用 y_t1_histname==1）时下一年的“结束类型”分布。只做这一步，先不建模。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) 建立代码本（codebook → 标签映射）</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>regend_map <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">v2regendtype =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">13</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">regend_label =</span> <span class="fu">c</span>(</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Military coup d’état&quot;</span>,                                   <span class="co"># 0</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Coup by non-military groups&quot;</span>,                            <span class="co"># 1</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Self-coup (autogolpe)&quot;</span>,                                  <span class="co"># 2</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Assassination of leader (non-coup)&quot;</span>,                     <span class="co"># 3</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Natural death of leader&quot;</span>,                                <span class="co"># 4</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Loss in civil war&quot;</span>,                                      <span class="co"># 5</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Loss in inter-state war&quot;</span>,                                <span class="co"># 6</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Foreign intervention (non inter-state loss)&quot;</span>,            <span class="co"># 7</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Popular uprising&quot;</span>,                                       <span class="co"># 8</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Liberalization/democratization guided by leaders&quot;</span>,       <span class="co"># 9</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Other directed transformation under leaders&quot;</span>,            <span class="co"># 10</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Liberalization/democratization w/o leader guidance&quot;</span>,     <span class="co"># 11</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Other process (not 1–11)&quot;</span>,                               <span class="co"># 12</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Regime still exists&quot;</span>                                     <span class="co"># 13</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) 总体分布（不区分是否发生变迁）</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>overall_dist <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(v2regendtype)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(v2regendtype, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(regend_map, <span class="at">by =</span> <span class="st">&quot;v2regendtype&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(v2regendtype)</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(overall_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) 建立代码本（codebook → 标签映射）</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>regend_map <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">v2regendtype =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">13</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">regend_label =</span> <span class="fu">c</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Military coup d’état&quot;</span>,                                   <span class="co"># 0</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Coup by non-military groups&quot;</span>,                            <span class="co"># 1</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Self-coup (autogolpe)&quot;</span>,                                  <span class="co"># 2</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Assassination of leader (non-coup)&quot;</span>,                     <span class="co"># 3</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Natural death of leader&quot;</span>,                                <span class="co"># 4</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Loss in civil war&quot;</span>,                                      <span class="co"># 5</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Loss in inter-state war&quot;</span>,                                <span class="co"># 6</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Foreign intervention (non inter-state loss)&quot;</span>,            <span class="co"># 7</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Popular uprising&quot;</span>,                                       <span class="co"># 8</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Liberalization/democratization guided by leaders&quot;</span>,       <span class="co"># 9</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Other directed transformation under leaders&quot;</span>,            <span class="co"># 10</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Liberalization/democratization w/o leader guidance&quot;</span>,     <span class="co"># 11</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Other process (not 1–11)&quot;</span>,                               <span class="co"># 12</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Regime still exists&quot;</span>                                     <span class="co"># 13</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) 总体分布（不区分是否发生变迁）</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>overall_dist <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(v2regendtype)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(v2regendtype, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(regend_map, <span class="at">by =</span> <span class="st">&quot;v2regendtype&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(v2regendtype)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(overall_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 14 × 4
    v2regendtype     n regend_label                                             p
@@ -3341,21 +3357,21 @@ background: #0a0e1a;
 13           12   239 Other process (not 1–11)                           0.00863
 14           13  6256 Regime still exists                                0.226  </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) 与你的“t→t+1 变迁”对齐：取下一年的结束类型（regend_t1）</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">regend_t1 =</span> dplyr<span class="sc">::</span><span class="fu">lead</span>(v2regendtype, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 仅在 y_t1_histname == 1 的行里看分布（且排除 code=13 “still exists”）</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>change_event_dist <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(y_t1_histname <span class="sc">==</span> <span class="dv">1</span>, <span class="sc">!</span><span class="fu">is.na</span>(regend_t1), regend_t1 <span class="sc">!=</span> <span class="dv">13</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(regend_t1, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(regend_map, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;regend_t1&quot;</span> <span class="ot">=</span> <span class="st">&quot;v2regendtype&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(p))</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(change_event_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) 与你的“t→t+1 变迁”对齐：取下一年的结束类型（regend_t1）</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>vdem_change <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_id) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">regend_t1 =</span> dplyr<span class="sc">::</span><span class="fu">lead</span>(v2regendtype, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 仅在 y_t1_histname == 1 的行里看分布（且排除 code=13 “still exists”）</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>change_event_dist <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(y_t1_histname <span class="sc">==</span> <span class="dv">1</span>, <span class="sc">!</span><span class="fu">is.na</span>(regend_t1), regend_t1 <span class="sc">!=</span> <span class="dv">13</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(regend_t1, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(regend_map, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;regend_t1&quot;</span> <span class="ot">=</span> <span class="st">&quot;v2regendtype&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(p))</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(change_event_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 13 × 4
    regend_t1     n regend_label                                             p
@@ -3374,113 +3390,150 @@ background: #0a0e1a;
 12         3     5 Assassination of leader (non-coup)                 0.00762
 13        12     5 Other process (not 1–11)                           0.00762</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) 两个极简检查</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>n_change_rows <span class="ot">&lt;-</span> <span class="fu">sum</span>(vdem_change<span class="sc">$</span>y_t1_histname <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>n_labeled_events <span class="ot">&lt;-</span> <span class="fu">sum</span>(vdem_change<span class="sc">$</span>y_t1_histname <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(vdem_change<span class="sc">$</span>regend_t1) <span class="sc">&amp;</span> vdem_change<span class="sc">$</span>regend_t1 <span class="sc">!=</span> <span class="dv">13</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;# of t+1 change rows:&quot;</span>, n_change_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) 两个极简检查</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>n_change_rows <span class="ot">&lt;-</span> <span class="fu">sum</span>(vdem_change<span class="sc">$</span>y_t1_histname <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>n_labeled_events <span class="ot">&lt;-</span> <span class="fu">sum</span>(vdem_change<span class="sc">$</span>y_t1_histname <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(vdem_change<span class="sc">$</span>regend_t1) <span class="sc">&amp;</span> vdem_change<span class="sc">$</span>regend_t1 <span class="sc">!=</span> <span class="dv">13</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;# of t+1 change rows:&quot;</span>, n_change_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># of t+1 change rows: 721 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;# of t+1 rows with a non-13 end-type label:&quot;</span>, n_labeled_events, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;# of t+1 rows with a non-13 end-type label:&quot;</span>, n_labeled_events, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># of t+1 rows with a non-13 end-type label: 656 </code></pre>
 </div>
 </div>
+<section id="步骤-ar-准备-y-和先验-α-β" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="步骤-ar-准备-y-和先验-α-β"><span class="header-section-number">4.1</span> 步骤 A（R → 准备 y 和先验 α, β）</h2>
+<p>放在 Python 块之前；它只做三件事：从 vdem_change 构造 y（t+1 是否以 coup 收场）、计算经验比例 p0、给出先验强度 m 和 alpha, beta。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)  <span class="co"># 8个样本</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: r-make-y-and-prior</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 用 regend_t1 构造二元 y：{0,1,2}=1；其它且≠13=0；13(仍存在)丢弃</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">with</span>(vdem_change, <span class="fu">ifelse</span>(regend_t1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), <span class="dv">1</span>L,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(regend_t1) <span class="sc">&amp;</span> regend_t1 <span class="sc">!=</span> <span class="dv">13</span>, <span class="dv">0</span>L, <span class="cn">NA_integer_</span>)))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> y[<span class="sc">!</span><span class="fu">is.na</span>(y)]            <span class="co"># 丢弃 NA</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(y)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 经验比例（先验中心）</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(y)                <span class="co"># 例如 0.08 左右（你的数据会自动算）</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>m  <span class="ot">&lt;-</span> <span class="dv">20</span>                     <span class="co"># 等效样本量（先小点；后续可调 50/100）</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> m <span class="sc">*</span> p0</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>beta  <span class="ot">&lt;-</span> m <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p0)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 小检查</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(y); <span class="fu">mean</span>(y); alpha; beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 21255</code></pre>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.213785</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.2757</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 15.7243</code></pre>
+</div>
+</div>
+</section>
+<section id="步骤-bpython-画pgm并落地成-svg-包含进-html" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="步骤-bpython-画pgm并落地成-svg-包含进-html"><span class="header-section-number">4.2</span> 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>WARNING (pytensor.configdefaults): g++ not available, if using conda: `conda install gxx`
 WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to compile C-implementations and will default to Python. Performance may be severely degraded. To remove this warning, set PyTensor flags cxx to an empty string.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> SVG</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>alpha, beta <span class="op">=</span> <span class="dv">20</span><span class="op">*</span><span class="fl">0.08</span>, <span class="dv">20</span><span class="op">*</span>(<span class="dv">1</span><span class="op">-</span><span class="fl">0.08</span>)  <span class="co"># 先验参数</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> beta_bern:</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    coup_t1 <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;coup_t1&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>dot <span class="op">=</span> pm.model_to_graphviz(beta_bern)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>svg_bytes <span class="op">=</span> dot.pipe(<span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(SVG(svg_bytes).data)  <span class="co"># QMD + results: asis 下可以直接显示</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从 R 取数</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">int</span>(r.N)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 给模型声明 plate</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {<span class="st">&quot;obs_id&quot;</span>: np.arange(N)}</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> beta_bern:</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 顶部：Beta先验</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 底部：观测数据（带 plate）</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;saycoup_obs&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y, dims<span class="op">=</span><span class="st">&quot;obs_id&quot;</span>)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成 pgm_base.svg 并清理中间文件</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(beta_bern).render(filename<span class="op">=</span><span class="st">&quot;pgm_base&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; width=&quot;134pt&quot; height=&quot;247pt&quot; viewBox=&quot;0.00 0.00 134.00 247.00&quot;&gt;
-&lt;g id=&quot;graph0&quot; class=&quot;graph&quot; transform=&quot;scale(1 1) rotate(0) translate(4 243.13)&quot;&gt;
-&lt;polygon fill=&quot;white&quot; stroke=&quot;none&quot; points=&quot;-4,4 -4,-243.13 130,-243.13 130,4 -4,4&quot;/&gt;
-&lt;g id=&quot;clust1&quot; class=&quot;cluster&quot;&gt;
-&lt;title&gt;cluster8&lt;/title&gt;
-&lt;path fill=&quot;none&quot; stroke=&quot;black&quot; d=&quot;M20,-8C20,-8 106,-8 106,-8 112,-8 118,-14 118,-20 118,-20 118,-117.82 118,-117.82 118,-123.82 112,-129.82 106,-129.82 106,-129.82 20,-129.82 20,-129.82 14,-129.82 8,-123.82 8,-117.82 8,-117.82 8,-20 8,-20 8,-14 14,-8 20,-8&quot;/&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;106.62&quot; y=&quot;-15.2&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;8&lt;/text&gt;
-&lt;/g&gt;
-&lt;!-- p_coup --&gt;
-&lt;g id=&quot;node1&quot; class=&quot;node&quot;&gt;
-&lt;title&gt;p_coup&lt;/title&gt;
-&lt;ellipse fill=&quot;none&quot; stroke=&quot;black&quot; cx=&quot;63&quot; cy=&quot;-198.48&quot; rx=&quot;39.42&quot; ry=&quot;40.66&quot;/&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-209.93&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;p_coup&lt;/text&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-193.43&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;~&lt;/text&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-176.93&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;Beta&lt;/text&gt;
-&lt;/g&gt;
-&lt;!-- coup_t1 --&gt;
-&lt;g id=&quot;node2&quot; class=&quot;node&quot;&gt;
-&lt;title&gt;coup_t1&lt;/title&gt;
-&lt;ellipse fill=&quot;lightgrey&quot; stroke=&quot;black&quot; cx=&quot;63&quot; cy=&quot;-81.16&quot; rx=&quot;47.38&quot; ry=&quot;40.66&quot;/&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-92.61&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;coup_t1&lt;/text&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-76.11&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;~&lt;/text&gt;
-&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-59.61&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;Bernoulli&lt;/text&gt;
-&lt;/g&gt;
-&lt;!-- p_coup&amp;#45;&amp;gt;coup_t1 --&gt;
-&lt;g id=&quot;edge1&quot; class=&quot;edge&quot;&gt;
-&lt;title&gt;p_coup-&amp;gt;coup_t1&lt;/title&gt;
-&lt;path fill=&quot;none&quot; stroke=&quot;black&quot; d=&quot;M63,-157.47C63,-149.69 63,-141.43 63,-133.34&quot;/&gt;
-&lt;polygon fill=&quot;black&quot; stroke=&quot;black&quot; points=&quot;66.5,-133.61 63,-123.61 59.5,-133.61 66.5,-133.61&quot;/&gt;
-&lt;/g&gt;
-&lt;/g&gt;
-&lt;/svg&gt;</code></pre>
+<pre><code>&#39;pgm_base.svg&#39;</code></pre>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dot <span class="op">=</span> pm.model_to_graphviz(beta_bern)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>dot.render(filename<span class="op">=</span><span class="st">&quot;pgm&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>&#39;pgm.svg&#39;</code></pre>
-</div>
-</div>
-<p><svg id="svg_08a2bd4c64b100628527" role="img" width="134pt" height="247pt" viewBox="0.00 0.00 134.00 247.00">
-<g id="svg_08a2bd4c64b100628527_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 243.13)">
-<polygon fill="white" stroke="none" points="-4,4 -4,-243.13 130,-243.13 130,4 -4,4"></polygon>
-<g id="svg_08a2bd4c64b100628527_clust1" class="cluster">
-<title>cluster8</title>
-<path fill="none" stroke="black" d="M20,-8C20,-8 106,-8 106,-8 112,-8 118,-14 118,-20 118,-20 118,-117.82 118,-117.82 118,-123.82 112,-129.82 106,-129.82 106,-129.82 20,-129.82 20,-129.82 14,-129.82 8,-123.82 8,-117.82 8,-117.82 8,-20 8,-20 8,-14 14,-8 20,-8" />
-<text xml:space="preserve" text-anchor="middle" x="106.62" y="-15.2" font-family="Times New Roman,serif" font-size="14.00">8</text>
+<p><svg id="svg_fb19a5a7b6bddb40aae7" role="img" width="162pt" height="247pt" viewBox="0.00 0.00 162.00 247.00">
+<g id="svg_fb19a5a7b6bddb40aae7_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 243.13)">
+<polygon fill="white" stroke="none" points="-4,4 -4,-243.13 158,-243.13 158,4 -4,4"></polygon>
+<g id="svg_fb19a5a7b6bddb40aae7_clust1" class="cluster">
+<title>clusterobs_id (21255)</title>
+<path fill="none" stroke="black" d="M20,-8C20,-8 134,-8 134,-8 140,-8 146,-14 146,-20 146,-20 146,-117.82 146,-117.82 146,-123.82 140,-129.82 134,-129.82 134,-129.82 20,-129.82 20,-129.82 14,-129.82 8,-123.82 8,-117.82 8,-117.82 8,-20 8,-20 8,-14 14,-8 20,-8" />
+<text xml:space="preserve" text-anchor="middle" x="96.75" y="-15.2" font-family="Times New Roman,serif" font-size="14.00">obs_id (21255)</text>
 </g>
 <!-- p_coup -->
-<g id="svg_08a2bd4c64b100628527_node1" class="node">
+<g id="svg_fb19a5a7b6bddb40aae7_node1" class="node">
 <title>p_coup</title>
-<ellipse fill="none" stroke="black" cx="63" cy="-198.48" rx="39.42" ry="40.66"></ellipse>
-<text xml:space="preserve" text-anchor="middle" x="63" y="-209.93" font-family="Times New Roman,serif" font-size="14.00">p_coup</text>
-<text xml:space="preserve" text-anchor="middle" x="63" y="-193.43" font-family="Times New Roman,serif" font-size="14.00">~</text>
-<text xml:space="preserve" text-anchor="middle" x="63" y="-176.93" font-family="Times New Roman,serif" font-size="14.00">Beta</text>
+<ellipse fill="none" stroke="black" cx="77" cy="-198.48" rx="39.42" ry="40.66"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-209.93" font-family="Times New Roman,serif" font-size="14.00">p_coup</text>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-193.43" font-family="Times New Roman,serif" font-size="14.00">~</text>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-176.93" font-family="Times New Roman,serif" font-size="14.00">Beta</text>
 </g>
-<!-- coup_t1 -->
-<g id="svg_08a2bd4c64b100628527_node2" class="node">
-<title>coup_t1</title>
-<ellipse fill="lightgrey" stroke="black" cx="63" cy="-81.16" rx="47.38" ry="40.66"></ellipse>
-<text xml:space="preserve" text-anchor="middle" x="63" y="-92.61" font-family="Times New Roman,serif" font-size="14.00">coup_t1</text>
-<text xml:space="preserve" text-anchor="middle" x="63" y="-76.11" font-family="Times New Roman,serif" font-size="14.00">~</text>
-<text xml:space="preserve" text-anchor="middle" x="63" y="-59.61" font-family="Times New Roman,serif" font-size="14.00">Bernoulli</text>
+<!-- saycoup_obs -->
+<g id="svg_fb19a5a7b6bddb40aae7_node2" class="node">
+<title>saycoup_obs</title>
+<ellipse fill="lightgrey" stroke="black" cx="77" cy="-81.16" rx="60.63" ry="40.66"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-92.61" font-family="Times New Roman,serif" font-size="14.00">saycoup_obs</text>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-76.11" font-family="Times New Roman,serif" font-size="14.00">~</text>
+<text xml:space="preserve" text-anchor="middle" x="77" y="-59.61" font-family="Times New Roman,serif" font-size="14.00">Bernoulli</text>
 </g>
-<!-- p_coup&#45;&gt;coup_t1 -->
-<g id="svg_08a2bd4c64b100628527_edge1" class="edge">
-<title>p_coup-&gt;coup_t1</title>
-<path fill="none" stroke="black" d="M63,-157.47C63,-149.69 63,-141.43 63,-133.34" />
-<polygon fill="black" stroke="black" points="66.5,-133.61 63,-123.61 59.5,-133.61 66.5,-133.61"></polygon>
+<!-- p_coup&#45;&gt;saycoup_obs -->
+<g id="svg_fb19a5a7b6bddb40aae7_edge1" class="edge">
+<title>p_coup-&gt;saycoup_obs</title>
+<path fill="none" stroke="black" d="M77,-157.47C77,-149.69 77,-141.43 77,-133.34" />
+<polygon fill="black" stroke="black" points="80.5,-133.61 77,-123.61 73.5,-133.61 80.5,-133.61"></polygon>
 </g>
 </g>
 </svg></p>
+</section>
+<section id="步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字"><span class="header-section-number">4.3</span> 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字</h2>
+<p>先不画图、不做复杂评估，只看先验均值 vs 后验均值 vs 观测均值，确认“信息更新”的方向对不对。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>RUN_MCMC <span class="op">=</span> <span class="bu">bool</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;RUN_MCMC&quot;</span>, <span class="va">False</span>))</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>DRAWS    <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;DRAWS&quot;</span>, <span class="dv">800</span>))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>TUNE     <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;TUNE&quot;</span>, <span class="dv">400</span>))</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>obs_mean   <span class="op">=</span> y.mean()</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> RUN_MCMC:</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> beta_bern:</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>        idata <span class="op">=</span> pm.sample(draws<span class="op">=</span>DRAWS, tune<span class="op">=</span>TUNE,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>                          chains<span class="op">=</span><span class="dv">2</span>, cores<span class="op">=</span><span class="dv">1</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>                          random_seed<span class="op">=</span><span class="dv">42</span>, compute_convergence_checks<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> <span class="bu">float</span>(idata.posterior[<span class="st">&quot;p_coup&quot;</span>].values.mean())</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;mcmc&quot;</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> (alpha <span class="op">+</span> s) <span class="op">/</span> (alpha <span class="op">+</span> beta <span class="op">+</span> N)   <span class="co"># Beta–Bernoulli 共轭的解析后验均值</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;analytic&quot;</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;mode&quot;</span>: mode,</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{&#39;mode&#39;: &#39;analytic&#39;, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.2138, &#39;post_mean&#39;: 0.2138}</code></pre>
+</div>
+</div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const toc = document.getElementById("TOC");
@@ -3507,6 +3560,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+</section>
 </section>
 
 </main>
