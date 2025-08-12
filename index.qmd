@@ -34,12 +34,12 @@ engine: knitr
 ```{r}
 #| label: setup-python
 #| message: false
+#| include: false
 library(reticulate)
 
 need <- c("pymc", "arviz", "numpy", "graphviz", "ipython")
 miss <- need[!sapply(need, py_module_available)]
 if (length(miss)) {
-  # 某些机器有证书变量干扰，先清一下
   if (!nzchar(Sys.getenv("SSL_CERT_FILE"))) Sys.unsetenv("SSL_CERT_FILE")
   py_install(miss, pip = TRUE)
 }
