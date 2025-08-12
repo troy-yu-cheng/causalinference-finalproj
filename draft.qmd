@@ -127,7 +127,41 @@ V-Dem includes a variable, v2reginfo, that labels distinct historical phases wit
 
 ## Create Regime Change Variable
 
-We define regime change as a change in the `histname` field within a country across years.
+
+
+
+
+V-Dem reports several regime identifiers that can be used to mark institutional continuity and rupture. We take a **state-centered** approach. Rather than adopting `v2reginfo`, which splits political history into leader- or phase-specific episodes (e.g., “USSR under Stalin”), we track the persistence of the overarching political unit via `histname`. Concretely, within each country we standardize `histname` and flag a **regime change this year** when it differs from the previous year. This choice treats leader rotations and intra-regime episodes as continuity while capturing foundational transformations such as refounding, merger, or dissolution. The next code chunk implements this step and, crucially for prediction, shifts the indicator one year forward to construct a **t to t+1** target (i.e., whether a change occurs next year, given information available at year t).
+
+Beyond whether a regime changes, we also care about **how** it ends. V-Dem’s `v2regendtype` records the process judged most important for terminating a regime in a given year. We align this process label to the design by defining `regend_t1` as the **next year’s** value of `v2regendtype`. From `regend_t1` we build the panel-wide outcome:
+- $Y*_{t+1} = 1$ if `regend_t1 ∈ {0, 1, 2}` (military coup, non-military coup, self-coup);
+- $Y*_{t+1} = 0$ for **all other non-missing** values, including “regime still exists” (`13`).
+
+This construction yields an outcome for **every** country–year and, by not restricting attention to cases that end, **avoids conditioning on termination**—a common collider that can bias comparisons of “coup vs. non-coup among endings.”
+
+The treatment is defined symmetrically at year t. Using `e_pt_coup_attempts`, we code `A_t = 1` when at least one coup attempt is recorded (count > 0) and `A_t = 0` otherwise. Because attempt coverage is strongest after the mid-20th century, the effective sample tilts toward that period; the data-preparation code filters missing values accordingly so that `A_t` and `Y*_{t+1}` are temporally aligned and jointly observed.
+
+Before turning to causal models, we report **descriptive priors** based on `v2regendtype`. First, we summarize the overall distribution of termination types to show that coup endings are comparatively rare and that “still exists” is common. Second, we examine the mix of types among observations that precede a `histname` change (aligned to `t+1`). These summaries calibrate prior beliefs about base rates and mechanisms, yet they are **not** used as conditioning variables in the causal stage; they serve only as context and a check on measurement.
+
+Finally, we include two simple diagnostics that connect measurement to the subsequent design. We display the base rate of within-country `histname` changes and spot-check a handful of flagged rows to verify that changes correspond to visible `histname` shifts. These checks, together with the year-forward alignment of `regend_t1`, establish the target we seek to explain—**coup termination next year**—and prepare the ground for the identification strategy that follows (country and year effects, plus a time-varying confounder).
+
+
+# Operationalizing Regime Change
+
+V-Dem provides multiple regime identifiers. The variable `v2reginfo` splits a political entity into fine-grained historical phases (e.g., “Soviet Russia,” “USSR under Stalin,” “Post-Stalin USSR”). For this study we adopt a **coarser, state-centered** notion of regime continuity and define regime change using `histname`: a country experiences a change when `histname` differs across adjacent years. This choice treats leader-centered episodes as continuity but flags foundational transformations that coincide with refounding, merger, or dissolution.
+
+To study *how* regimes end, we use `v2regendtype`—V-Dem’s coding of the process judged most important for ending the regime in a given year. Codes `0`, `1`, and `2` correspond to **military coup**, **non-military coup**, and **self-coup**, respectively; `13` denotes “regime still exists.” For predictive work and to avoid conditioning on future outcomes, we construct two derived variables:
+
+-   (Y\^\*\_{t+1}): an indicator that the **next year’s** regime termination (if any) ends **via a coup**, i.e., `v2regendtype_{t+1} ∈ {0,1,2}` (coded 1). All non-missing non-coup endings—including “still exists” (`13`)—are coded 0.
+-   (A_t): an indicator that **at least one coup attempt** is recorded in year (t), based on `e_pt_coup_attempts` (1 if \>0, 0 if =0).
+
+This construction avoids a common collider: conditioning on the event “the regime ends” in year (t{+}1). Instead of modelling (Y\_{t+1} \mid E\_{t+1}=1), we model the marginal probability of a **coup termination next year** and ask whether (A_t) shifts that probability.
+
+As a descriptive prior, we first examine the marginal distribution of `v2regendtype` and the distribution conditional on `histname` changes. These summaries inform prior beliefs but are not used as conditioning variables in the causal model.
+
+## Descriptive priors from *v2regendtype*
+
+Before modelling, we summarize how regimes end in V-Dem—both overall and among years that precede a `histname` change. These tables are descriptive only; they provide useful priors (e.g., coups are rare relative to other endings).We define regime change as a change in the `histname` field within a country across years.
 
 ```{r}
 vdem_1 <- vdem |> 
@@ -296,6 +330,19 @@ plot(allEffects(model_bg))
 ## Interpretation
 
 Initial results suggest that lower levels of electoral democracy and active civil conflict significantly increase the likelihood of regime change. However, economic indicators such as GDP and education do not appear to have strong predictive power in this specification.
+
+
+
+
+# Causal pipeline
+
+We now switch from descriptive summaries to a causal design. The outcome is defined for **all** country–years: whether the regime ends **via a coup** in the next year (t{+}1). The treatment is whether there is **at least one coup attempt** in year (t). This avoids conditioning on termination and lets us interpret changes **within countries over time**, after adjusting for country and year effects and a time-varying confounder (civil war).
+
+## Constructing the outcome and the treatment
+
+We map `v2regendtype_{t+1} ∈ {0,1,2}` to (Y\^\*\_{t+1}=1) (coup termination next year) and all other non-missing codes—including “still exists” (`13`)—to 0. For the treatment, we use `e_pt_coup_attempts_t>0`. we also record a weakly informative prior for the base rate via the sample mean.
+
+
 
 ---
 
