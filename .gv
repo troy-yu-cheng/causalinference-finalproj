@@ -1,0 +1,12 @@
+digraph {
+	p_coup [label="p_coup
+~
+Beta" shape=ellipse]
+	subgraph cluster86 {
+		coup_t1 [label="coup_t1
+~
+Bernoulli" shape=ellipse style=filled]
+		label=86 labeljust=r labelloc=b style=rounded
+	}
+	p_coup -> coup_t1
+}

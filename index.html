@@ -3386,6 +3386,101 @@ background: #0a0e1a;
 <pre><code># of t+1 rows with a non-13 end-type label: 656 </code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)  <span class="co"># 8个样本</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>WARNING (pytensor.configdefaults): g++ not available, if using conda: `conda install gxx`
+WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to compile C-implementations and will default to Python. Performance may be severely degraded. To remove this warning, set PyTensor flags cxx to an empty string.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> SVG</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>alpha, beta <span class="op">=</span> <span class="dv">20</span><span class="op">*</span><span class="fl">0.08</span>, <span class="dv">20</span><span class="op">*</span>(<span class="dv">1</span><span class="op">-</span><span class="fl">0.08</span>)  <span class="co"># 先验参数</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> beta_bern:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    coup_t1 <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;coup_t1&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>dot <span class="op">=</span> pm.model_to_graphviz(beta_bern)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>svg_bytes <span class="op">=</span> dot.pipe(<span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(SVG(svg_bytes).data)  <span class="co"># QMD + results: asis 下可以直接显示</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; width=&quot;134pt&quot; height=&quot;247pt&quot; viewBox=&quot;0.00 0.00 134.00 247.00&quot;&gt;
+&lt;g id=&quot;graph0&quot; class=&quot;graph&quot; transform=&quot;scale(1 1) rotate(0) translate(4 243.13)&quot;&gt;
+&lt;polygon fill=&quot;white&quot; stroke=&quot;none&quot; points=&quot;-4,4 -4,-243.13 130,-243.13 130,4 -4,4&quot;/&gt;
+&lt;g id=&quot;clust1&quot; class=&quot;cluster&quot;&gt;
+&lt;title&gt;cluster8&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;black&quot; d=&quot;M20,-8C20,-8 106,-8 106,-8 112,-8 118,-14 118,-20 118,-20 118,-117.82 118,-117.82 118,-123.82 112,-129.82 106,-129.82 106,-129.82 20,-129.82 20,-129.82 14,-129.82 8,-123.82 8,-117.82 8,-117.82 8,-20 8,-20 8,-14 14,-8 20,-8&quot;/&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;106.62&quot; y=&quot;-15.2&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;8&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- p_coup --&gt;
+&lt;g id=&quot;node1&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;p_coup&lt;/title&gt;
+&lt;ellipse fill=&quot;none&quot; stroke=&quot;black&quot; cx=&quot;63&quot; cy=&quot;-198.48&quot; rx=&quot;39.42&quot; ry=&quot;40.66&quot;/&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-209.93&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;p_coup&lt;/text&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-193.43&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;~&lt;/text&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-176.93&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;Beta&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- coup_t1 --&gt;
+&lt;g id=&quot;node2&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;coup_t1&lt;/title&gt;
+&lt;ellipse fill=&quot;lightgrey&quot; stroke=&quot;black&quot; cx=&quot;63&quot; cy=&quot;-81.16&quot; rx=&quot;47.38&quot; ry=&quot;40.66&quot;/&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-92.61&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;coup_t1&lt;/text&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-76.11&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;~&lt;/text&gt;
+&lt;text xml:space=&quot;preserve&quot; text-anchor=&quot;middle&quot; x=&quot;63&quot; y=&quot;-59.61&quot; font-family=&quot;Times New Roman,serif&quot; font-size=&quot;14.00&quot;&gt;Bernoulli&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- p_coup&amp;#45;&amp;gt;coup_t1 --&gt;
+&lt;g id=&quot;edge1&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;p_coup-&amp;gt;coup_t1&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;black&quot; d=&quot;M63,-157.47C63,-149.69 63,-141.43 63,-133.34&quot;/&gt;
+&lt;polygon fill=&quot;black&quot; stroke=&quot;black&quot; points=&quot;66.5,-133.61 63,-123.61 59.5,-133.61 66.5,-133.61&quot;/&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dot <span class="op">=</span> pm.model_to_graphviz(beta_bern)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>dot.render(filename<span class="op">=</span><span class="st">&quot;pgm&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&#39;pgm.svg&#39;</code></pre>
+</div>
+</div>
+<p><svg id="svg_08a2bd4c64b100628527" role="img" width="134pt" height="247pt" viewBox="0.00 0.00 134.00 247.00">
+<g id="svg_08a2bd4c64b100628527_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 243.13)">
+<polygon fill="white" stroke="none" points="-4,4 -4,-243.13 130,-243.13 130,4 -4,4"></polygon>
+<g id="svg_08a2bd4c64b100628527_clust1" class="cluster">
+<title>cluster8</title>
+<path fill="none" stroke="black" d="M20,-8C20,-8 106,-8 106,-8 112,-8 118,-14 118,-20 118,-20 118,-117.82 118,-117.82 118,-123.82 112,-129.82 106,-129.82 106,-129.82 20,-129.82 20,-129.82 14,-129.82 8,-123.82 8,-117.82 8,-117.82 8,-20 8,-20 8,-14 14,-8 20,-8" />
+<text xml:space="preserve" text-anchor="middle" x="106.62" y="-15.2" font-family="Times New Roman,serif" font-size="14.00">8</text>
+</g>
+<!-- p_coup -->
+<g id="svg_08a2bd4c64b100628527_node1" class="node">
+<title>p_coup</title>
+<ellipse fill="none" stroke="black" cx="63" cy="-198.48" rx="39.42" ry="40.66"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="63" y="-209.93" font-family="Times New Roman,serif" font-size="14.00">p_coup</text>
+<text xml:space="preserve" text-anchor="middle" x="63" y="-193.43" font-family="Times New Roman,serif" font-size="14.00">~</text>
+<text xml:space="preserve" text-anchor="middle" x="63" y="-176.93" font-family="Times New Roman,serif" font-size="14.00">Beta</text>
+</g>
+<!-- coup_t1 -->
+<g id="svg_08a2bd4c64b100628527_node2" class="node">
+<title>coup_t1</title>
+<ellipse fill="lightgrey" stroke="black" cx="63" cy="-81.16" rx="47.38" ry="40.66"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="63" y="-92.61" font-family="Times New Roman,serif" font-size="14.00">coup_t1</text>
+<text xml:space="preserve" text-anchor="middle" x="63" y="-76.11" font-family="Times New Roman,serif" font-size="14.00">~</text>
+<text xml:space="preserve" text-anchor="middle" x="63" y="-59.61" font-family="Times New Roman,serif" font-size="14.00">Bernoulli</text>
+</g>
+<!-- p_coup&#45;&gt;coup_t1 -->
+<g id="svg_08a2bd4c64b100628527_edge1" class="edge">
+<title>p_coup-&gt;coup_t1</title>
+<path fill="none" stroke="black" d="M63,-157.47C63,-149.69 63,-141.43 63,-133.34" />
+<polygon fill="black" stroke="black" points="66.5,-133.61 63,-123.61 59.5,-133.61 66.5,-133.61"></polygon>
+</g>
+</g>
+</svg></p>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const toc = document.getElementById("TOC");
