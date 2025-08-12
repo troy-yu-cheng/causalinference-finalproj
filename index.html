@@ -3432,99 +3432,220 @@ background: #0a0e1a;
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>df_yx <span class="ot">&lt;-</span> vdem_change <span class="sc">%&gt;%</span></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">case_when</span>(</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      regend_t1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">~</span> <span class="dv">1</span>L,</span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(regend_t1) <span class="sc">&amp;</span> regend_t1 <span class="sc">!=</span> <span class="dv">13</span> <span class="sc">~</span> <span class="dv">0</span>L,</span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_integer_</span></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ① 企图次数（当年 t）</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">coup_attempts_t =</span> e_pt_coup_attempts,</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ② 二值化：是否有企图（成功与否都算）</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_attempt =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(coup_attempts_t) <span class="sc">&amp;</span> coup_attempts_t <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>L, <span class="dv">0</span>L)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(y)) <span class="sc">%&gt;%</span>                  <span class="co"># 跟 y 对齐</span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(y, x_attempt)</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 传给 Python</span></span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_yx<span class="sc">$</span>y)</span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_yx<span class="sc">$</span>x_attempt)</span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 看一下两组样本量（有/无企图）</span></span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_attempt =</span> <span class="fu">case_when</span>(</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(e_pt_coup_attempts) <span class="sc">&amp;</span> e_pt_coup_attempts <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="dv">1</span>L,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(e_pt_coup_attempts) <span class="sc">&amp;</span> e_pt_coup_attempts <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="dv">0</span>L,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_integer_</span>  <span class="co"># ← NA 保留</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(y)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">drop_na</span>(x_attempt) <span class="sc">%&gt;%</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(y, x_attempt)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 传给 Python</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_yx<span class="sc">$</span>y)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(df_yx<span class="sc">$</span>x_attempt)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 看一下两组样本量（有/无企图）</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>x
+   0    1 
+4684  359 </code></pre>
+</div>
+</div>
+<p>下面这个 <strong>R 代码块</strong>放在你现在的 <code>r-make-x</code> 之后（或者至少放在所有 Python 块之前）。为了不影响你已有的 baseline，我们用全新的对象名：<code>y_star / x_attempt / alpha_star / beta_star / N_star</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: r-make-y-star</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Y*_{t+1}: 次年是否以政变方式结束</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 = regend_t1 ∈ {0,1,2}; 0 = 其它所有非缺失（包括“仍存在”=13，以及非政变结束）</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>y_star <span class="ot">&lt;-</span> <span class="fu">with</span>(vdem_change, <span class="fu">ifelse</span>(</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  regend_t1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), <span class="dv">1</span>L,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(regend_t1), <span class="dv">0</span>L, <span class="cn">NA_integer_</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 与 attempt 对齐：e_pt_coup_attempts 在 1950+ 才有，丢弃 NA</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>attempts <span class="ot">&lt;-</span> vdem_change<span class="sc">$</span>e_pt_coup_attempts</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(y_star) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(attempts)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>y_star    <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(y_star[keep])</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>x_attempt <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(attempts[keep] <span class="sc">&gt;</span> <span class="dv">0</span>)  <span class="co"># 1=当年有政变企图，0=没有</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>N_star    <span class="ot">&lt;-</span> <span class="fu">length</span>(y_star)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 先验中心：用全样本的平均当作先验中心（后面可换成 train 集）</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>p0_star    <span class="ot">&lt;-</span> <span class="fu">mean</span>(y_star)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>m_star     <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>alpha_star <span class="ot">&lt;-</span> m_star <span class="sc">*</span> p0_star</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>beta_star  <span class="ot">&lt;-</span> m_star <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p0_star)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 小检查（请把这两行的输出贴给我）</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y_star); <span class="fu">table</span>(x_attempt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1796597</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x_attempt
     0     1 
-20896   359 </code></pre>
+10280   418 </code></pre>
+</div>
+</div>
+<p>把这段放在上面 R 块<strong>后面</strong>即可（它只用到 <code>r.y_star / r.x_attempt / r.alpha_star / r.beta_star</code>）。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>y_star    <span class="op">=</span> np.array(r.y_star, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>x_attempt <span class="op">=</span> np.array(r.x_attempt, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>alpha     <span class="op">=</span> <span class="bu">float</span>(r.alpha_star)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>beta      <span class="op">=</span> <span class="bu">float</span>(r.beta_star)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> group_stats(mask, name):</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> y_star[mask]</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    post_mean  <span class="op">=</span> (alpha <span class="op">+</span> s)<span class="op">/</span>(alpha <span class="op">+</span> beta <span class="op">+</span> n)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    obs_mean   <span class="op">=</span> y.mean()</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;group&quot;</span>: name, <span class="st">&quot;n&quot;</span>: n,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)}</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> [group_stats(x_attempt<span class="op">==</span><span class="dv">1</span>, <span class="st">&quot;attempt=1&quot;</span>),</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>       group_stats(x_attempt<span class="op">==</span><span class="dv">0</span>, <span class="st">&quot;attempt=0&quot;</span>)]</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[{&#39;group&#39;: &#39;attempt=1&#39;, &#39;n&#39;: 418, &#39;prior_mean&#39;: 0.1797, &#39;obs_mean&#39;: 0.4258, &#39;post_mean&#39;: 0.4146}, {&#39;group&#39;: &#39;attempt=0&#39;, &#39;n&#39;: 10280, &#39;prior_mean&#39;: 0.1797, &#39;obs_mean&#39;: 0.1696, &#39;post_mean&#39;: 0.1697}]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 不确定性：后验抽样求区间与差值概率</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> post_draws(mask, size<span class="op">=</span><span class="dv">40000</span>):</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> y_star[mask]</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> alpha <span class="op">+</span> s<span class="op">;</span> b <span class="op">=</span> beta <span class="op">+</span> (n <span class="op">-</span> s)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rng.beta(a, b, size<span class="op">=</span>size)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> post_draws(x_attempt<span class="op">==</span><span class="dv">1</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>d0 <span class="op">=</span> post_draws(x_attempt<span class="op">==</span><span class="dv">0</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> d1 <span class="op">-</span> d0</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;diff_mean&quot;</span>: <span class="bu">float</span>(diff.mean()),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Pr(diff&gt;0)&quot;</span>: <span class="bu">float</span>((diff<span class="op">&gt;</span><span class="dv">0</span>).mean()),</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;diff_ci95&quot;</span>: <span class="bu">tuple</span>(np.<span class="bu">round</span>(np.quantile(diff, [<span class="fl">0.025</span>, <span class="fl">0.975</span>]), <span class="dv">4</span>))</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{&#39;diff_mean&#39;: 0.24487812242561358, &#39;Pr(diff&gt;0)&#39;: 1.0, &#39;diff_ci95&#39;: (np.float64(0.1983), np.float64(0.2924))}</code></pre>
 </div>
 </div>
 <p>条件版解析（两组的 prior/obs/post）</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array(r.x, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> stats(mask, name):</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    y_g <span class="op">=</span> y[mask]<span class="op">;</span> n <span class="op">=</span> <span class="bu">len</span>(y_g)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y_g.<span class="bu">sum</span>())</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    post_mean  <span class="op">=</span> (alpha <span class="op">+</span> s)<span class="op">/</span>(alpha <span class="op">+</span> beta <span class="op">+</span> n)   <span class="co"># Beta–Bernoulli 共轭后验均值</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    obs_mean   <span class="op">=</span> y_g.mean() <span class="cf">if</span> n<span class="op">&gt;</span><span class="dv">0</span> <span class="cf">else</span> np.nan</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;group&quot;</span>: name, <span class="st">&quot;n&quot;</span>: n,</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)}</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> [stats(x<span class="op">==</span><span class="dv">1</span>, <span class="st">&quot;attempt=1&quot;</span>), stats(x<span class="op">==</span><span class="dv">0</span>, <span class="st">&quot;attempt=0&quot;</span>)]</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array(r.x, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> stats(mask, name):</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    y_g <span class="op">=</span> y[mask]<span class="op">;</span> n <span class="op">=</span> <span class="bu">len</span>(y_g)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y_g.<span class="bu">sum</span>())</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    post_mean  <span class="op">=</span> (alpha <span class="op">+</span> s)<span class="op">/</span>(alpha <span class="op">+</span> beta <span class="op">+</span> n)   <span class="co"># Beta–Bernoulli 共轭后验均值</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    obs_mean   <span class="op">=</span> y_g.mean() <span class="cf">if</span> n<span class="op">&gt;</span><span class="dv">0</span> <span class="cf">else</span> np.nan</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;group&quot;</span>: name, <span class="st">&quot;n&quot;</span>: n,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)}</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> [stats(x<span class="op">==</span><span class="dv">1</span>, <span class="st">&quot;attempt=1&quot;</span>), stats(x<span class="op">==</span><span class="dv">0</span>, <span class="st">&quot;attempt=0&quot;</span>)]</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[{&#39;group&#39;: &#39;attempt=1&#39;, &#39;n&#39;: 359, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.4958, &#39;post_mean&#39;: 0.4809}, {&#39;group&#39;: &#39;attempt=0&#39;, &#39;n&#39;: 20896, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.2089, &#39;post_mean&#39;: 0.2089}]</code></pre>
+<pre><code>[{&#39;group&#39;: &#39;attempt=1&#39;, &#39;n&#39;: 359, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.4958, &#39;post_mean&#39;: 0.4809}, {&#39;group&#39;: &#39;attempt=0&#39;, &#39;n&#39;: 4684, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.3723, &#39;post_mean&#39;: 0.3717}]</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;posterior_diff&quot;</span>: <span class="bu">round</span>(out[<span class="dv">0</span>][<span class="st">&quot;post_mean&quot;</span>] <span class="op">-</span> out[<span class="dv">1</span>][<span class="st">&quot;post_mean&quot;</span>], <span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;posterior_diff&quot;</span>: <span class="bu">round</span>(out[<span class="dv">0</span>][<span class="st">&quot;post_mean&quot;</span>] <span class="op">-</span> out[<span class="dv">1</span>][<span class="st">&quot;post_mean&quot;</span>], <span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{&#39;posterior_diff&#39;: 0.272}</code></pre>
+<pre><code>{&#39;posterior_diff&#39;: 0.1092}</code></pre>
+</div>
+</div>
+<p>我们用 Beta 共轭的后验抽样，给两组各自的 95% 区间，并给出“差值&gt;0 的后验概率”。把下面这段 放在你刚打印两组均值的 Python 块后面 即可：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array(r.x, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> post_draws(mask, size<span class="op">=</span><span class="dv">50000</span>):</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    y_g <span class="op">=</span> y[mask]</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y_g)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y_g.<span class="bu">sum</span>())</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> alpha <span class="op">+</span> s</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> beta  <span class="op">+</span> (n <span class="op">-</span> s)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rng.beta(a, b, size<span class="op">=</span>size)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> post_draws(x<span class="op">==</span><span class="dv">1</span>)   <span class="co"># attempt=1</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>d0 <span class="op">=</span> post_draws(x<span class="op">==</span><span class="dv">0</span>)   <span class="co"># attempt=0</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> d1 <span class="op">-</span> d0</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> summarize(d):</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;mean&quot;</span>: <span class="bu">float</span>(d.mean()),</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;ci90&quot;</span>: <span class="bu">tuple</span>(np.<span class="bu">round</span>(np.quantile(d, [<span class="fl">0.05</span>, <span class="fl">0.95</span>]), <span class="dv">4</span>)),</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;ci95&quot;</span>: <span class="bu">tuple</span>(np.<span class="bu">round</span>(np.quantile(d, [<span class="fl">0.025</span>, <span class="fl">0.975</span>]), <span class="dv">4</span>)),</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;attempt=1&quot;</span>: summarize(d1),</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;attempt=0&quot;</span>: summarize(d0),</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;diff_mean&quot;</span>: <span class="bu">float</span>(diff.mean()),</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Pr(diff&gt;0)&quot;</span>: <span class="bu">float</span>((diff <span class="op">&gt;</span> <span class="dv">0</span>).mean()),</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;diff_ci95&quot;</span>: <span class="bu">tuple</span>(np.<span class="bu">round</span>(np.quantile(diff, [<span class="fl">0.025</span>, <span class="fl">0.975</span>]), <span class="dv">4</span>)),</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{&#39;attempt=1&#39;: {&#39;mean&#39;: 0.48090089672127084, &#39;ci90&#39;: (np.float64(0.4385), np.float64(0.5232)), &#39;ci95&#39;: (np.float64(0.4308), np.float64(0.5317))}, &#39;attempt=0&#39;: {&#39;mean&#39;: 0.3716634141075102, &#39;ci90&#39;: (np.float64(0.3601), np.float64(0.3833)), &#39;ci95&#39;: (np.float64(0.3579), np.float64(0.3855))}, &#39;diff_mean&#39;: 0.10923748261376057, &#39;Pr(diff&gt;0)&#39;: 1.0, &#39;diff_ci95&#39;: (np.float64(0.0567), np.float64(0.162))}</code></pre>
 </div>
 </div>
 </section>
 <section id="步骤-bpython-画pgm并落地成-svg-包含进-html" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="步骤-bpython-画pgm并落地成-svg-包含进-html"><span class="header-section-number">4.2</span> 步骤 B（Python → 画PGM并落地成 SVG 包含进 HTML）</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>WARNING (pytensor.configdefaults): g++ not available, if using conda: `conda install gxx`
-WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to compile C-implementations and will default to Python. Performance may be severely degraded. To remove this warning, set PyTensor flags cxx to an empty string.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 从 R 取数</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">int</span>(r.N)</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 给模型声明 plate</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {<span class="st">&quot;obs_id&quot;</span>: np.arange(N)}</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> beta_bern:</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 顶部：Beta先验</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 底部：观测数据（带 plate）</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;saycoup_obs&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y, dims<span class="op">=</span><span class="st">&quot;obs_id&quot;</span>)</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成 pgm_base.svg 并清理中间文件</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(beta_bern).render(filename<span class="op">=</span><span class="st">&quot;pgm_base&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 从 R 取数</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">int</span>(r.N)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 给模型声明 plate</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {<span class="st">&quot;obs_id&quot;</span>: np.arange(N)}</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> beta_bern:</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 顶部：Beta先验</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    p_coup <span class="op">=</span> pm.Beta(<span class="st">&quot;p_coup&quot;</span>, alpha<span class="op">=</span>alpha, beta<span class="op">=</span>beta)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 底部：观测数据（带 plate）</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Bernoulli(<span class="st">&quot;saycoup_obs&quot;</span>, p<span class="op">=</span>p_coup, observed<span class="op">=</span>y, dims<span class="op">=</span><span class="st">&quot;obs_id&quot;</span>)</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成 pgm_base.svg 并清理中间文件</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(beta_bern).render(filename<span class="op">=</span><span class="st">&quot;pgm_base&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&#39;pgm_base.svg&#39;</code></pre>
 </div>
 </div>
-<p><svg id="svg_fb19a5a7b6bddb40aae7" role="img" width="162pt" height="247pt" viewBox="0.00 0.00 162.00 247.00">
-<g id="svg_fb19a5a7b6bddb40aae7_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 243.13)">
+<p><svg id="svg_86833048e7a62a3f326b" role="img" width="162pt" height="247pt" viewBox="0.00 0.00 162.00 247.00">
+<g id="svg_86833048e7a62a3f326b_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 243.13)">
 <polygon fill="white" stroke="none" points="-4,4 -4,-243.13 158,-243.13 158,4 -4,4"></polygon>
-<g id="svg_fb19a5a7b6bddb40aae7_clust1" class="cluster">
-<title>clusterobs_id (21255)</title>
+<g id="svg_86833048e7a62a3f326b_clust1" class="cluster">
+<title>clusterobs_id (5043)</title>
 <path fill="none" stroke="black" d="M20,-8C20,-8 134,-8 134,-8 140,-8 146,-14 146,-20 146,-20 146,-117.82 146,-117.82 146,-123.82 140,-129.82 134,-129.82 134,-129.82 20,-129.82 20,-129.82 14,-129.82 8,-123.82 8,-117.82 8,-117.82 8,-20 8,-20 8,-14 14,-8 20,-8" />
-<text xml:space="preserve" text-anchor="middle" x="96.75" y="-15.2" font-family="Times New Roman,serif" font-size="14.00">obs_id (21255)</text>
+<text xml:space="preserve" text-anchor="middle" x="100.12" y="-15.2" font-family="Times New Roman,serif" font-size="14.00">obs_id (5043)</text>
 </g>
 <!-- p_coup -->
-<g id="svg_fb19a5a7b6bddb40aae7_node1" class="node">
+<g id="svg_86833048e7a62a3f326b_node1" class="node">
 <title>p_coup</title>
 <ellipse fill="none" stroke="black" cx="77" cy="-198.48" rx="39.42" ry="40.66"></ellipse>
 <text xml:space="preserve" text-anchor="middle" x="77" y="-209.93" font-family="Times New Roman,serif" font-size="14.00">p_coup</text>
@@ -3532,7 +3653,7 @@ WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to
 <text xml:space="preserve" text-anchor="middle" x="77" y="-176.93" font-family="Times New Roman,serif" font-size="14.00">Beta</text>
 </g>
 <!-- saycoup_obs -->
-<g id="svg_fb19a5a7b6bddb40aae7_node2" class="node">
+<g id="svg_86833048e7a62a3f326b_node2" class="node">
 <title>saycoup_obs</title>
 <ellipse fill="lightgrey" stroke="black" cx="77" cy="-81.16" rx="60.63" ry="40.66"></ellipse>
 <text xml:space="preserve" text-anchor="middle" x="77" y="-92.61" font-family="Times New Roman,serif" font-size="14.00">saycoup_obs</text>
@@ -3540,7 +3661,7 @@ WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to
 <text xml:space="preserve" text-anchor="middle" x="77" y="-59.61" font-family="Times New Roman,serif" font-size="14.00">Bernoulli</text>
 </g>
 <!-- p_coup&#45;&gt;saycoup_obs -->
-<g id="svg_fb19a5a7b6bddb40aae7_edge1" class="edge">
+<g id="svg_86833048e7a62a3f326b_edge1" class="edge">
 <title>p_coup-&gt;saycoup_obs</title>
 <path fill="none" stroke="black" d="M77,-157.47C77,-149.69 77,-141.43 77,-133.34" />
 <polygon fill="black" stroke="black" points="80.5,-133.61 77,-123.61 73.5,-133.61 80.5,-133.61"></polygon>
@@ -3557,42 +3678,235 @@ WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable to
 <li><p>“<strong>内战</strong>的年份 vs 非内战年份，这个概率有什么差异？”</p></li>
 </ul>
 <p>所以要加“条件变量”（covariate），是为了<strong>把总体概率拆成情境化的概率</strong>，也就是从</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> Digraph(<span class="st">&quot;dag_bad&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>)<span class="op">;</span> g.attr(rankdir<span class="op">=</span><span class="st">&quot;LR&quot;</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;A_t</span><span class="ch">\n</span><span class="st">(coup attempts)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;C_t</span><span class="ch">\n</span><span class="st">(conflicts, protest,</span><span class="ch">\n</span><span class="st">repression, shocks)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;U&quot;</span>,<span class="st">&quot;U_i</span><span class="ch">\n</span><span class="st">(country trait)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;E&quot;</span>,<span class="st">&quot;E_{t+1}</span><span class="ch">\n</span><span class="st">(any regime end)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;box&quot;</span>)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;Y_{t+1}</span><span class="ch">\n</span><span class="st">(coup vs not | E=1)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;box&quot;</span>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co"># edges</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>g.edge(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;E&quot;</span>)<span class="op">;</span> g.edge(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;E&quot;</span>)<span class="op">;</span> g.edge(<span class="st">&quot;U&quot;</span>,<span class="st">&quot;E&quot;</span>)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>g.edge(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;Y&quot;</span>)<span class="op">;</span> g.edge(<span class="st">&quot;U&quot;</span>,<span class="st">&quot;Y&quot;</span>)</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="co"># conditioning (visual hint)</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>g.edge(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;Y&quot;</span>, style<span class="op">=</span><span class="st">&quot;dashed&quot;</span>, label<span class="op">=</span><span class="st">&quot;selection bias via E&quot;</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>g.render(<span class="st">&quot;dag_bad&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&#39;dag_bad.svg&#39;</code></pre>
+</div>
+</div>
+<p><svg id="svg_5478b8a16889553537a5" role="img" width="442pt" height="242pt" viewBox="0.00 0.00 442.00 242.00">
+<g id="svg_5478b8a16889553537a5_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 237.65)">
+<title>dag_bad</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-237.65 437.56,-237.65 437.56,4 -4,4"></polygon>
+<!-- A -->
+<g id="svg_5478b8a16889553537a5_node1" class="node">
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="85.03" cy="-104.99" rx="71.77" ry="28.99"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-108.19" font-family="Times New Roman,serif" font-size="14.00">A_t</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-91.69" font-family="Times New Roman,serif" font-size="14.00">(coup attempts)</text>
+</g>
+<!-- E -->
+<g id="svg_5478b8a16889553537a5_node4" class="node">
+<title>E</title>
+<polygon fill="none" stroke="black" points="427.56,-91.49 317.81,-91.49 317.81,-50.49 427.56,-50.49 427.56,-91.49"></polygon>
+<text xml:space="preserve" text-anchor="middle" x="372.68" y="-74.19" font-family="Times New Roman,serif" font-size="14.00">E_{t+1}</text>
+<text xml:space="preserve" text-anchor="middle" x="372.68" y="-57.69" font-family="Times New Roman,serif" font-size="14.00">(any regime end)</text>
+</g>
+<!-- A&#45;&gt;E -->
+<g id="svg_5478b8a16889553537a5_edge1" class="edge">
+<title>A-&gt;E</title>
+<path fill="none" stroke="black" d="M154.45,-96.85C200.56,-91.36 261.01,-84.16 306.44,-78.76" />
+<polygon fill="black" stroke="black" points="306.62,-82.26 316.14,-77.6 305.8,-75.31 306.62,-82.26"></polygon>
+</g>
+<!-- Y -->
+<g id="svg_5478b8a16889553537a5_node5" class="node">
+<title>Y</title>
+<polygon fill="none" stroke="black" points="433.56,-150.49 311.81,-150.49 311.81,-109.49 433.56,-109.49 433.56,-150.49"></polygon>
+<text xml:space="preserve" text-anchor="middle" x="372.68" y="-133.19" font-family="Times New Roman,serif" font-size="14.00">Y_{t+1}</text>
+<text xml:space="preserve" text-anchor="middle" x="372.68" y="-116.69" font-family="Times New Roman,serif" font-size="14.00">(coup vs not | E=1)</text>
+</g>
+<!-- A&#45;&gt;Y -->
+<g id="svg_5478b8a16889553537a5_edge6" class="edge">
+<title>A-&gt;Y</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M155.54,-111.08C199.45,-114.92 256.03,-119.87 300.29,-123.74" />
+<polygon fill="black" stroke="black" points="299.78,-127.21 310.05,-124.6 300.39,-120.24 299.78,-127.21"></polygon>
+<text xml:space="preserve" text-anchor="middle" x="240.93" y="-125.8" font-family="Times New Roman,serif" font-size="14.00">selection bias via E</text>
+</g>
+<!-- C -->
+<g id="svg_5478b8a16889553537a5_node2" class="node">
+<title>C</title>
+<ellipse fill="none" stroke="black" cx="85.03" cy="-192.99" rx="85.03" ry="40.66"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-204.44" font-family="Times New Roman,serif" font-size="14.00">C_t</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-187.94" font-family="Times New Roman,serif" font-size="14.00">(conflicts, protest,</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-171.44" font-family="Times New Roman,serif" font-size="14.00">repression, shocks)</text>
+</g>
+<!-- C&#45;&gt;E -->
+<g id="svg_5478b8a16889553537a5_edge2" class="edge">
+<title>C-&gt;E</title>
+<path fill="none" stroke="black" d="M166.94,-181.15C216.67,-172.46 274.46,-159.32 293.81,-142.99 309.33,-129.89 297.88,-115.77 311.81,-100.99 312.51,-100.25 313.23,-99.53 313.97,-98.82" />
+<polygon fill="black" stroke="black" points="315.85,-101.79 321.38,-92.75 311.42,-96.38 315.85,-101.79"></polygon>
+</g>
+<!-- C&#45;&gt;Y -->
+<g id="svg_5478b8a16889553537a5_edge4" class="edge">
+<title>C-&gt;Y</title>
+<path fill="none" stroke="black" d="M170.39,-195.3C208.83,-194.14 254.44,-189.6 293.81,-176.99 308.05,-172.43 322.41,-164.81 334.85,-157.03" />
+<polygon fill="black" stroke="black" points="336.66,-160.03 343.11,-151.63 332.83,-154.17 336.66,-160.03"></polygon>
+</g>
+<!-- U -->
+<g id="svg_5478b8a16889553537a5_node3" class="node">
+<title>U</title>
+<ellipse fill="none" stroke="black" cx="85.03" cy="-28.99" rx="64.88" ry="28.99"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-32.19" font-family="Times New Roman,serif" font-size="14.00">U_i</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-15.69" font-family="Times New Roman,serif" font-size="14.00">(country trait)</text>
+</g>
+<!-- U&#45;&gt;E -->
+<g id="svg_5478b8a16889553537a5_edge3" class="edge">
+<title>U-&gt;E</title>
+<path fill="none" stroke="black" d="M146.96,-37.95C193.83,-44.84 258.48,-54.35 306.41,-61.39" />
+<polygon fill="black" stroke="black" points="305.69,-64.83 316.1,-62.82 306.71,-57.9 305.69,-64.83"></polygon>
+</g>
+<!-- U&#45;&gt;Y -->
+<g id="svg_5478b8a16889553537a5_edge5" class="edge">
+<title>U-&gt;Y</title>
+<path fill="none" stroke="black" d="M136.06,-47.28C152.6,-53.28 171.1,-59.96 188.06,-65.99 225.23,-79.21 266.73,-93.69 300.85,-105.54" />
+<polygon fill="black" stroke="black" points="299.64,-108.82 310.23,-108.79 301.93,-102.2 299.64,-108.82"></polygon>
+</g>
+</g>
+</svg></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: dag_good</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> Digraph(<span class="st">&quot;dag_good&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;svg&quot;</span>)<span class="op">;</span> g.attr(rankdir<span class="op">=</span><span class="st">&quot;LR&quot;</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;A_t</span><span class="ch">\n</span><span class="st">(coup attempts)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;C_t</span><span class="ch">\n</span><span class="st">(conflicts, protest,</span><span class="ch">\n</span><span class="st">repression, shocks)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;U&quot;</span>,<span class="st">&quot;U_i</span><span class="ch">\n</span><span class="st">(country trait)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;T&quot;</span>,<span class="st">&quot;W_t</span><span class="ch">\n</span><span class="st">(year FE)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;ellipse&quot;</span>)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>g.node(<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;Y*_{t+1}</span><span class="ch">\n</span><span class="st">(coup end next year?)&quot;</span>, shape<span class="op">=</span><span class="st">&quot;box&quot;</span>)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="co"># edges</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> s <span class="kw">in</span> [<span class="st">&quot;A&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;U&quot;</span>,<span class="st">&quot;T&quot;</span>]:</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    g.edge(s,<span class="st">&quot;Y&quot;</span>)</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>g.edge(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;A&quot;</span>)<span class="op">;</span> g.edge(<span class="st">&quot;U&quot;</span>,<span class="st">&quot;A&quot;</span>)    <span class="co"># 混杂导致 A 与 Y 相关</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>g.render(<span class="st">&quot;dag_good&quot;</span>, cleanup<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&#39;dag_good.svg&#39;</code></pre>
+</div>
+</div>
+<p><svg id="svg_c58b1352a959d829d7ff" role="img" width="528pt" height="242pt" viewBox="0.00 0.00 528.00 242.00">
+<g id="svg_c58b1352a959d829d7ff_graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 237.65)">
+<title>dag_good</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-237.65 524.1,-237.65 524.1,4 -4,4"></polygon>
+<!-- A -->
+<g id="svg_c58b1352a959d829d7ff_node1" class="node">
+<title>A</title>
+<ellipse fill="none" stroke="black" cx="277.83" cy="-142.99" rx="71.77" ry="28.99"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="277.83" y="-146.19" font-family="Times New Roman,serif" font-size="14.00">A_t</text>
+<text xml:space="preserve" text-anchor="middle" x="277.83" y="-129.69" font-family="Times New Roman,serif" font-size="14.00">(coup attempts)</text>
+</g>
+<!-- Y -->
+<g id="svg_c58b1352a959d829d7ff_node5" class="node">
+<title>Y</title>
+<polygon fill="none" stroke="black" points="520.1,-134.49 385.6,-134.49 385.6,-93.49 520.1,-93.49 520.1,-134.49"></polygon>
+<text xml:space="preserve" text-anchor="middle" x="452.85" y="-117.19" font-family="Times New Roman,serif" font-size="14.00">Y*_{t+1}</text>
+<text xml:space="preserve" text-anchor="middle" x="452.85" y="-100.69" font-family="Times New Roman,serif" font-size="14.00">(coup end next year?)</text>
+</g>
+<!-- A&#45;&gt;Y -->
+<g id="svg_c58b1352a959d829d7ff_edge1" class="edge">
+<title>A-&gt;Y</title>
+<path fill="none" stroke="black" d="M344.74,-131.94C354.28,-130.35 364.17,-128.69 373.92,-127.05" />
+<polygon fill="black" stroke="black" points="374.49,-130.51 383.78,-125.4 373.34,-123.6 374.49,-130.51"></polygon>
+</g>
+<!-- C -->
+<g id="svg_c58b1352a959d829d7ff_node2" class="node">
+<title>C</title>
+<ellipse fill="none" stroke="black" cx="85.03" cy="-192.99" rx="85.03" ry="40.66"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-204.44" font-family="Times New Roman,serif" font-size="14.00">C_t</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-187.94" font-family="Times New Roman,serif" font-size="14.00">(conflicts, protest,</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-171.44" font-family="Times New Roman,serif" font-size="14.00">repression, shocks)</text>
+</g>
+<!-- C&#45;&gt;A -->
+<g id="svg_c58b1352a959d829d7ff_edge5" class="edge">
+<title>C-&gt;A</title>
+<path fill="none" stroke="black" d="M160.34,-173.52C175.42,-169.57 191.23,-165.42 206.17,-161.51" />
+<polygon fill="black" stroke="black" points="206.62,-165.01 215.41,-159.09 204.85,-158.24 206.62,-165.01"></polygon>
+</g>
+<!-- C&#45;&gt;Y -->
+<g id="svg_c58b1352a959d829d7ff_edge2" class="edge">
+<title>C-&gt;Y</title>
+<path fill="none" stroke="black" d="M169.06,-200.29C221.98,-202.27 291.31,-199.84 349.6,-180.99 375.11,-172.74 400.34,-156.32 419.36,-141.8" />
+<polygon fill="black" stroke="black" points="421.29,-144.74 426.98,-135.8 416.96,-139.23 421.29,-144.74"></polygon>
+</g>
+<!-- U -->
+<g id="svg_c58b1352a959d829d7ff_node3" class="node">
+<title>U</title>
+<ellipse fill="none" stroke="black" cx="85.03" cy="-98.99" rx="64.88" ry="28.99"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-102.19" font-family="Times New Roman,serif" font-size="14.00">U_i</text>
+<text xml:space="preserve" text-anchor="middle" x="85.03" y="-85.69" font-family="Times New Roman,serif" font-size="14.00">(country trait)</text>
+</g>
+<!-- U&#45;&gt;A -->
+<g id="svg_c58b1352a959d829d7ff_edge6" class="edge">
+<title>U-&gt;A</title>
+<path fill="none" stroke="black" d="M143.28,-112.19C162.36,-116.59 183.87,-121.55 203.97,-126.19" />
+<polygon fill="black" stroke="black" points="202.96,-129.55 213.49,-128.39 204.54,-122.73 202.96,-129.55"></polygon>
+</g>
+<!-- U&#45;&gt;Y -->
+<g id="svg_c58b1352a959d829d7ff_edge3" class="edge">
+<title>U-&gt;Y</title>
+<path fill="none" stroke="black" d="M150.26,-99.29C203.65,-99.81 281.62,-101.23 349.6,-104.99 357.55,-105.43 365.84,-105.99 374.11,-106.62" />
+<polygon fill="black" stroke="black" points="373.59,-110.09 383.84,-107.39 374.14,-103.11 373.59,-110.09"></polygon>
+</g>
+<!-- T -->
+<g id="svg_c58b1352a959d829d7ff_node4" class="node">
+<title>T</title>
+<ellipse fill="none" stroke="black" cx="277.83" cy="-28.99" rx="47.91" ry="28.99"></ellipse>
+<text xml:space="preserve" text-anchor="middle" x="277.83" y="-32.19" font-family="Times New Roman,serif" font-size="14.00">W_t</text>
+<text xml:space="preserve" text-anchor="middle" x="277.83" y="-15.69" font-family="Times New Roman,serif" font-size="14.00">(year FE)</text>
+</g>
+<!-- T&#45;&gt;Y -->
+<g id="svg_c58b1352a959d829d7ff_edge4" class="edge">
+<title>T-&gt;Y</title>
+<path fill="none" stroke="black" d="M315.52,-47.02C339.8,-58.94 372.02,-74.77 399.04,-88.04" />
+<polygon fill="black" stroke="black" points="397.23,-91.06 407.75,-92.33 400.32,-84.78 397.23,-91.06"></polygon>
+</g>
+</g>
+</svg></p>
 </section>
 <section id="步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="步骤-cpython-最小的-priorposterior-一致性检查只打印-3-个数字"><span class="header-section-number">4.3</span> 步骤 C（Python → 最小的 prior–posterior 一致性检查：只打印 3 个数字</h2>
 <p>先不画图、不做复杂评估，只看先验均值 vs 后验均值 vs 观测均值，确认“信息更新”的方向对不对。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>RUN_MCMC <span class="op">=</span> <span class="bu">bool</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;RUN_MCMC&quot;</span>, <span class="va">False</span>))</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>DRAWS    <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;DRAWS&quot;</span>, <span class="dv">800</span>))</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>TUNE     <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;TUNE&quot;</span>, <span class="dv">400</span>))</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>obs_mean   <span class="op">=</span> y.mean()</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> RUN_MCMC:</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> beta_bern:</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        idata <span class="op">=</span> pm.sample(draws<span class="op">=</span>DRAWS, tune<span class="op">=</span>TUNE,</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                          chains<span class="op">=</span><span class="dv">2</span>, cores<span class="op">=</span><span class="dv">1</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>,</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>                          random_seed<span class="op">=</span><span class="dv">42</span>, compute_convergence_checks<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> <span class="bu">float</span>(idata.posterior[<span class="st">&quot;p_coup&quot;</span>].values.mean())</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;mcmc&quot;</span></span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> (alpha <span class="op">+</span> s) <span class="op">/</span> (alpha <span class="op">+</span> beta <span class="op">+</span> N)   <span class="co"># Beta–Bernoulli 共轭的解析后验均值</span></span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;analytic&quot;</span></span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;mode&quot;</span>: mode,</span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, pymc <span class="im">as</span> pm</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ——关键：兜底默认值，避免 r.RUN_MCMC 未定义时报错——</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>RUN_MCMC <span class="op">=</span> <span class="bu">bool</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;RUN_MCMC&quot;</span>, <span class="va">False</span>))</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>DRAWS    <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;DRAWS&quot;</span>, <span class="dv">800</span>))</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>TUNE     <span class="op">=</span> <span class="bu">int</span>(<span class="bu">getattr</span>(r, <span class="st">&quot;TUNE&quot;</span>, <span class="dv">400</span>))</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(r.y, dtype<span class="op">=</span><span class="st">&quot;int64&quot;</span>)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="bu">float</span>(r.alpha)<span class="op">;</span> beta <span class="op">=</span> <span class="bu">float</span>(r.beta)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="op">=</span> alpha<span class="op">/</span>(alpha<span class="op">+</span>beta)</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>obs_mean   <span class="op">=</span> y.mean()</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> RUN_MCMC:</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> beta_bern:</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>        idata <span class="op">=</span> pm.sample(draws<span class="op">=</span>DRAWS, tune<span class="op">=</span>TUNE,</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>                          chains<span class="op">=</span><span class="dv">2</span>, cores<span class="op">=</span><span class="dv">1</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>,</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>                          random_seed<span class="op">=</span><span class="dv">42</span>, compute_convergence_checks<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> <span class="bu">float</span>(idata.posterior[<span class="st">&quot;p_coup&quot;</span>].values.mean())</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;mcmc&quot;</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(y)<span class="op">;</span> s <span class="op">=</span> <span class="bu">int</span>(y.<span class="bu">sum</span>())</span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>    post_mean <span class="op">=</span> (alpha <span class="op">+</span> s) <span class="op">/</span> (alpha <span class="op">+</span> beta <span class="op">+</span> N)   <span class="co"># Beta–Bernoulli 共轭的解析后验均值</span></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>    mode <span class="op">=</span> <span class="st">&quot;analytic&quot;</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">&quot;mode&quot;</span>: mode,</span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;prior_mean&quot;</span>: <span class="bu">round</span>(<span class="bu">float</span>(prior_mean),<span class="dv">4</span>),</span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;obs_mean&quot;</span>:   <span class="bu">round</span>(<span class="bu">float</span>(obs_mean),<span class="dv">4</span>),</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;post_mean&quot;</span>:  <span class="bu">round</span>(<span class="bu">float</span>(post_mean),<span class="dv">4</span>)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{&#39;mode&#39;: &#39;analytic&#39;, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.2138, &#39;post_mean&#39;: 0.2138}</code></pre>
+<pre><code>{&#39;mode&#39;: &#39;analytic&#39;, &#39;prior_mean&#39;: 0.2138, &#39;obs_mean&#39;: 0.3811, &#39;post_mean&#39;: 0.3805}</code></pre>
 </div>
 </div>
 <script>
