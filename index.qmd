@@ -1,6 +1,6 @@
 ---
 title: "Causal Inference for Computational Social Science"
-subtitle: "Regime Change Causal Modeling with V-Dem"
+subtitle: "Do Coup Attempts Beget Coups? A V-Dem Country–Year Panel for Temporal Causal Inference"
 author: 
   - name: "Troy Cheng, Hongzhe Wang"
     email: yc1317@georgetown.edu
@@ -119,23 +119,23 @@ The block below (i) standardizes `histname`, (ii) flags a within-country change 
 #| message: false
 
 # Standardize `histname` to avoid spurious changes due to case/whitespace
-vdem_change <- vdem %>%
-  arrange(country_id, year) %>%
+vdem_change <- vdem |>
+  arrange(country_id, year) |>
   mutate(histname_std = str_squish(str_to_lower(histname)))
 
 # Define within-country regime change this year by adjacent-year difference in `histname`
-vdem_change <- vdem_change %>%
-  group_by(country_id) %>%
+vdem_change <- vdem_change |>
+  group_by(country_id) |>
   mutate(
     regime_change_histname = as.integer(!is.na(histname_std) & histname_std != lag(histname_std))
-  ) %>%
-  ungroup() %>%
+  ) |>
+  ungroup() |>
   mutate(regime_change_histname = replace_na(regime_change_histname, 0L))
 
 # Prediction-oriented: construct Y_{t+1} (use year-t features to predict change at t+1)
-vdem_change <- vdem_change %>%
-  group_by(country_id) %>%
-  mutate(y_t1_histname = replace_na(lead(regime_change_histname, 1), 0L)) %>%
+vdem_change <- vdem_change |>
+  group_by(country_id) |>
+  mutate(y_t1_histname = replace_na(lead(regime_change_histname, 1), 0L)) |>
   ungroup()
 
 ```
@@ -147,9 +147,9 @@ Next, we report the base rate of within-country changes to calibrate rarity. We 
 mean(vdem_change$regime_change_histname, na.rm = TRUE)
 
 # Spot-check a few rows with a change (sanity check)
-vdem_change %>%
-  filter(regime_change_histname == 1) %>%
-  select(country_name, year, histname) %>%
+vdem_change |>
+  filter(regime_change_histname == 1) |>
+  select(country_name, year, histname) |>
   head(10)
 
 ```
@@ -188,27 +188,27 @@ regend_map <- tibble::tibble(
 )
 
 # Overall distribution (not conditioning on change)
-overall_dist <- vdem_change %>%
-  filter(!is.na(v2regendtype)) %>%
-  count(v2regendtype, name = "n") %>%
-  left_join(regend_map, by = "v2regendtype") %>%
-  mutate(p = n / sum(n)) %>%
+overall_dist <- vdem_change |>
+  filter(!is.na(v2regendtype)) |>
+  count(v2regendtype, name = "n") |>
+  left_join(regend_map, by = "v2regendtype") |>
+  mutate(p = n / sum(n)) |>
   arrange(v2regendtype)
 
 print(overall_dist)
 
 # Align with the t → t+1 design: take next year's end type (regend_t1)
-vdem_change <- vdem_change %>%
-  group_by(country_id) %>%
-  mutate(regend_t1 = dplyr::lead(v2regendtype, 1)) %>%
+vdem_change <- vdem_change |>
+  group_by(country_id) |>
+  mutate(regend_t1 = dplyr::lead(v2regendtype, 1)) |>
   ungroup()
 
 # Among rows that precede a histname change at t+1; exclude code=13 ("still exists")
-change_event_dist <- vdem_change %>%
-  filter(y_t1_histname == 1, !is.na(regend_t1), regend_t1 != 13) %>%
-  count(regend_t1, name = "n") %>%
-  left_join(regend_map, by = c("regend_t1" = "v2regendtype")) %>%
-  mutate(p = n / sum(n)) %>%
+change_event_dist <- vdem_change |>
+  filter(y_t1_histname == 1, !is.na(regend_t1), regend_t1 != 13) |>
+  count(regend_t1, name = "n") |>
+  left_join(regend_map, by = c("regend_t1" = "v2regendtype")) |>
+  mutate(p = n / sum(n)) |>
   arrange(desc(p))
 
 print(change_event_dist)
@@ -393,7 +393,7 @@ Country fixed effects absorb time-invariant heterogeneity ($U_i$) and year fixed
 #| label: r-y-star-frame
 #| message: false
 
-df_star <- vdem_change %>%
+df_star <- vdem_change |>
   mutate(
     y_star = ifelse(regend_t1 %in% c(0,1,2), 1L,
              ifelse(!is.na(regend_t1), 0L, NA_integer_)),
@@ -402,8 +402,8 @@ df_star <- vdem_change %>%
       !is.na(e_pt_coup_attempts) & e_pt_coup_attempts == 0 ~ 0L,
       TRUE ~ NA_integer_
     )
-  ) %>%
-  filter(!is.na(y_star), !is.na(attempt)) %>%
+  ) |>
+  filter(!is.na(y_star), !is.na(attempt)) |>
   select(country_id, year, y_star, attempt)
 
 summary(df_star$y_star); table(df_star$attempt)
@@ -509,7 +509,7 @@ Civil war plausibly affects both the incidence of attempts and the probability o
 #| message: false
 
 # Rebuild a dataframe on the original vdem_change that includes the conflict variable
-df_star2 <- vdem_change %>%
+df_star2 <- vdem_change |>
   mutate(
     # Outcome: does next year end via a coup?
     # 1 if regend_t1 ∈ {0,1,2}; 0 for all other non-missing (including "still exists" = 13 and non-coup endings)
@@ -523,9 +523,9 @@ df_star2 <- vdem_change %>%
     ),
     # Key time-varying confounder C_t — civil war in year t (treat missing as 0)
     any_conflict = as.integer(replace_na(e_civil_war, 0) > 0)
-  ) %>%
+  ) |>
   # Align with the availability of attempts; drop rows with NA in y_star or attempt
-  filter(!is.na(y_star), !is.na(attempt)) %>%
+  filter(!is.na(y_star), !is.na(attempt)) |>
   select(country_id, year, y_star, attempt, any_conflict)
 
 # Quick check: counts of 0/1 (including NA if any)
